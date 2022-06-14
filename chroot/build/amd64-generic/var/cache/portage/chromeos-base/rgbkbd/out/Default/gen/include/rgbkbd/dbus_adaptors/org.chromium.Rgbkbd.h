@@ -95,6 +95,17 @@ class RgbkbdAdaptor {
         "SetAnimationMode",
         base::Unretained(interface_),
         &RgbkbdInterface::SetAnimationMode);
+
+    signal_CapabilityUpdatedForTesting_ = itf->RegisterSignalOfType<SignalCapabilityUpdatedForTestingType>("CapabilityUpdatedForTesting");
+  }
+
+  // Signals that the RGB keyboard capability has been updated. This is only
+  // used for tests.
+  void SendCapabilityUpdatedForTestingSignal(
+      uint32_t in_capability) {
+    auto signal = signal_CapabilityUpdatedForTesting_.lock();
+    if (signal)
+      signal->Send(in_capability);
   }
 
   static dbus::ObjectPath GetObjectPath() {
@@ -124,10 +135,17 @@ class RgbkbdAdaptor {
         "    <method name=\"SetAnimationMode\">\n"
         "      <arg name=\"mode\" type=\"u\" direction=\"in\"/>\n"
         "    </method>\n"
+        "    <signal name=\"CapabilityUpdatedForTesting\">\n"
+        "      <arg name=\"capability\" type=\"u\"/>\n"
+        "    </signal>\n"
         "  </interface>\n";
   }
 
  private:
+  using SignalCapabilityUpdatedForTestingType = brillo::dbus_utils::DBusSignal<
+      uint32_t /*capability*/>;
+  std::weak_ptr<SignalCapabilityUpdatedForTestingType> signal_CapabilityUpdatedForTesting_;
+
   RgbkbdInterface* interface_;  // Owned by container of this adapter.
 };
 
