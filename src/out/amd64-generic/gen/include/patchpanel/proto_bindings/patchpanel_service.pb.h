@@ -5065,6 +5065,7 @@ class SetDnsRedirectionRuleRequest :
     kNameserversFieldNumber = 4,
     kInputIfnameFieldNumber = 2,
     kProxyAddressFieldNumber = 3,
+    kHostIfnameFieldNumber = 5,
     kTypeFieldNumber = 1,
   };
   // repeated string nameservers = 4;
@@ -5123,6 +5124,22 @@ class SetDnsRedirectionRuleRequest :
   std::string* _internal_mutable_proxy_address();
   public:
 
+  // string host_ifname = 5;
+  void clear_host_ifname();
+  const std::string& host_ifname() const;
+  void set_host_ifname(const std::string& value);
+  void set_host_ifname(std::string&& value);
+  void set_host_ifname(const char* value);
+  void set_host_ifname(const char* value, size_t size);
+  std::string* mutable_host_ifname();
+  std::string* release_host_ifname();
+  void set_allocated_host_ifname(std::string* host_ifname);
+  private:
+  const std::string& _internal_host_ifname() const;
+  void _internal_set_host_ifname(const std::string& value);
+  std::string* _internal_mutable_host_ifname();
+  public:
+
   // .patchpanel.SetDnsRedirectionRuleRequest.RuleType type = 1;
   void clear_type();
   ::patchpanel::SetDnsRedirectionRuleRequest_RuleType type() const;
@@ -5140,6 +5157,7 @@ class SetDnsRedirectionRuleRequest :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> nameservers_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr input_ifname_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr proxy_address_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr host_ifname_;
   int type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_patchpanel_5fservice_2eproto;
@@ -7663,6 +7681,66 @@ inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
 SetDnsRedirectionRuleRequest::mutable_nameservers() {
   // @@protoc_insertion_point(field_mutable_list:patchpanel.SetDnsRedirectionRuleRequest.nameservers)
   return &nameservers_;
+}
+
+// string host_ifname = 5;
+inline void SetDnsRedirectionRuleRequest::clear_host_ifname() {
+  host_ifname_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline const std::string& SetDnsRedirectionRuleRequest::host_ifname() const {
+  // @@protoc_insertion_point(field_get:patchpanel.SetDnsRedirectionRuleRequest.host_ifname)
+  return _internal_host_ifname();
+}
+inline void SetDnsRedirectionRuleRequest::set_host_ifname(const std::string& value) {
+  _internal_set_host_ifname(value);
+  // @@protoc_insertion_point(field_set:patchpanel.SetDnsRedirectionRuleRequest.host_ifname)
+}
+inline std::string* SetDnsRedirectionRuleRequest::mutable_host_ifname() {
+  // @@protoc_insertion_point(field_mutable:patchpanel.SetDnsRedirectionRuleRequest.host_ifname)
+  return _internal_mutable_host_ifname();
+}
+inline const std::string& SetDnsRedirectionRuleRequest::_internal_host_ifname() const {
+  return host_ifname_.GetNoArena();
+}
+inline void SetDnsRedirectionRuleRequest::_internal_set_host_ifname(const std::string& value) {
+  
+  host_ifname_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void SetDnsRedirectionRuleRequest::set_host_ifname(std::string&& value) {
+  
+  host_ifname_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:patchpanel.SetDnsRedirectionRuleRequest.host_ifname)
+}
+inline void SetDnsRedirectionRuleRequest::set_host_ifname(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  host_ifname_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:patchpanel.SetDnsRedirectionRuleRequest.host_ifname)
+}
+inline void SetDnsRedirectionRuleRequest::set_host_ifname(const char* value, size_t size) {
+  
+  host_ifname_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:patchpanel.SetDnsRedirectionRuleRequest.host_ifname)
+}
+inline std::string* SetDnsRedirectionRuleRequest::_internal_mutable_host_ifname() {
+  
+  return host_ifname_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* SetDnsRedirectionRuleRequest::release_host_ifname() {
+  // @@protoc_insertion_point(field_release:patchpanel.SetDnsRedirectionRuleRequest.host_ifname)
+  
+  return host_ifname_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void SetDnsRedirectionRuleRequest::set_allocated_host_ifname(std::string* host_ifname) {
+  if (host_ifname != nullptr) {
+    
+  } else {
+    
+  }
+  host_ifname_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), host_ifname);
+  // @@protoc_insertion_point(field_set_allocated:patchpanel.SetDnsRedirectionRuleRequest.host_ifname)
 }
 
 // -------------------------------------------------------------------

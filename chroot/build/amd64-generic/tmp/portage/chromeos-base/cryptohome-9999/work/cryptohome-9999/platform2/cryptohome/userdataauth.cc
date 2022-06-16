@@ -565,6 +565,7 @@ void UserDataAuth::CreateMountThreadDBus() {
 }
 
 void UserDataAuth::ShutdownTask() {
+  default_challenge_credentials_helper_.reset();
   if (mount_thread_bus_) {
     mount_thread_bus_->ShutdownAndBlock();
     mount_thread_bus_.reset();
@@ -2060,15 +2061,6 @@ void UserDataAuth::ContinueMountWithCredentials(
     code = AttemptUserMount(auth_session, mount_args, user_session);
   } else {
     code = AttemptUserMount(*credentials, mount_args, user_session);
-  }
-  // Does actual mounting here.
-  if (!code.ok() && code->mount_error() == MOUNT_ERROR_TPM_COMM_ERROR) {
-    LOG(WARNING) << "TPM communication error. Retrying.";
-    if (auth_session) {
-      code = AttemptUserMount(auth_session, mount_args, user_session);
-    } else {
-      code = AttemptUserMount(*credentials, mount_args, user_session);
-    }
   }
 
   if (!code.ok() && code->mount_error() == MOUNT_ERROR_VAULT_UNRECOVERABLE) {
@@ -4315,13 +4307,6 @@ CryptohomeStatus UserDataAuth::PreparePersistentVaultImpl(
   MountStatus mount_status = session_status.value()->MountVault(
       auth_session_status.value()->username(),
       auth_session_status.value()->file_system_keyset(), vault_options);
-  if (!mount_status.ok() &&
-      mount_status->mount_error() == MOUNT_ERROR_TPM_COMM_ERROR) {
-    LOG(WARNING) << "TPM communication error. Retrying.";
-    mount_status = session_status.value()->MountVault(
-        auth_session_status.value()->username(),
-        auth_session_status.value()->file_system_keyset(), vault_options);
-  }
   ReportTimerStop(kMountExTimer);
   PostMountHook(session_status.value(), mount_status);
   if (!mount_status.ok()) {

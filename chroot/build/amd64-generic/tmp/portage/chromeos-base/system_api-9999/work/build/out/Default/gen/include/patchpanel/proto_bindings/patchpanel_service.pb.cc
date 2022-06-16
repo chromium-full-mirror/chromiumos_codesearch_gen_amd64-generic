@@ -8006,6 +8006,10 @@ SetDnsRedirectionRuleRequest::SetDnsRedirectionRuleRequest(const SetDnsRedirecti
   if (!from._internal_proxy_address().empty()) {
     proxy_address_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.proxy_address_);
   }
+  host_ifname_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_host_ifname().empty()) {
+    host_ifname_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.host_ifname_);
+  }
   type_ = from.type_;
   // @@protoc_insertion_point(copy_constructor:patchpanel.SetDnsRedirectionRuleRequest)
 }
@@ -8014,6 +8018,7 @@ void SetDnsRedirectionRuleRequest::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_SetDnsRedirectionRuleRequest_patchpanel_5fservice_2eproto.base);
   input_ifname_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   proxy_address_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  host_ifname_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   type_ = 0;
 }
 
@@ -8025,6 +8030,7 @@ SetDnsRedirectionRuleRequest::~SetDnsRedirectionRuleRequest() {
 void SetDnsRedirectionRuleRequest::SharedDtor() {
   input_ifname_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   proxy_address_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  host_ifname_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void SetDnsRedirectionRuleRequest::SetCachedSize(int size) const {
@@ -8045,6 +8051,7 @@ void SetDnsRedirectionRuleRequest::Clear() {
   nameservers_.Clear();
   input_ifname_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   proxy_address_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  host_ifname_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   type_ = 0;
   _internal_metadata_.Clear();
 }
@@ -8094,6 +8101,15 @@ const char* SetDnsRedirectionRuleRequest::_InternalParse(const char* ptr, ::PROT
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // string host_ifname = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          auto str = _internal_mutable_host_ifname();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, nullptr));
+          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       default: {
@@ -8159,6 +8175,16 @@ failure:
     target = stream->WriteString(4, s, target);
   }
 
+  // string host_ifname = 5;
+  if (this->host_ifname().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_host_ifname().data(), static_cast<int>(this->_internal_host_ifname().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "patchpanel.SetDnsRedirectionRuleRequest.host_ifname");
+    target = stream->WriteStringMaybeAliased(
+        5, this->_internal_host_ifname(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = stream->WriteRaw(_internal_metadata_.unknown_fields().data(),
         static_cast<int>(_internal_metadata_.unknown_fields().size()), target);
@@ -8197,6 +8223,13 @@ size_t SetDnsRedirectionRuleRequest::ByteSizeLong() const {
         this->_internal_proxy_address());
   }
 
+  // string host_ifname = 5;
+  if (this->host_ifname().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_host_ifname());
+  }
+
   // .patchpanel.SetDnsRedirectionRuleRequest.RuleType type = 1;
   if (this->type() != 0) {
     total_size += 1 +
@@ -8233,6 +8266,10 @@ void SetDnsRedirectionRuleRequest::MergeFrom(const SetDnsRedirectionRuleRequest&
 
     proxy_address_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.proxy_address_);
   }
+  if (from.host_ifname().size() > 0) {
+
+    host_ifname_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.host_ifname_);
+  }
   if (from.type() != 0) {
     _internal_set_type(from._internal_type());
   }
@@ -8256,6 +8293,8 @@ void SetDnsRedirectionRuleRequest::InternalSwap(SetDnsRedirectionRuleRequest* ot
   input_ifname_.Swap(&other->input_ifname_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   proxy_address_.Swap(&other->proxy_address_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  host_ifname_.Swap(&other->host_ifname_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(type_, other->type_);
 }

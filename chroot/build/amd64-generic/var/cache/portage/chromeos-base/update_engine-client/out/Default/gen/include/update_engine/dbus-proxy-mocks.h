@@ -33,6 +33,13 @@ class UpdateEngineInterfaceProxyMock : public UpdateEngineInterfaceProxyInterfac
                     base::OnceCallback<void()> /*success_callback*/,
                     base::OnceCallback<void(brillo::Error*)> /*error_callback*/,
                     int /*timeout_ms*/));
+  MOCK_METHOD2(ApplyDeferredUpdate,
+               bool(brillo::ErrorPtr* /*error*/,
+                    int /*timeout_ms*/));
+  MOCK_METHOD3(ApplyDeferredUpdateAsync,
+               void(base::OnceCallback<void()> /*success_callback*/,
+                    base::OnceCallback<void(brillo::Error*)> /*error_callback*/,
+                    int /*timeout_ms*/));
   MOCK_METHOD4(AttemptInstall,
                bool(const std::string& /*in_omaha_url*/,
                     const std::vector<std::string>& /*in_dlc_ids*/,
