@@ -67,7 +67,7 @@
 #define CLANG_HAVE_RLIMITS 1
 
 /* The LLVM product name and version */
-#define BACKEND_PACKAGE_STRING "LLVM 14.0.0git"
+#define BACKEND_PACKAGE_STRING "LLVM 15.0.0git"
 
 /* Linker version detected at compile time. */
 /* #undef HOST_LINK_VERSION */
@@ -88,5 +88,8 @@
 
 /* Spawn a new process clang.exe for the CC1 tool invocation, when necessary */
 #define CLANG_SPAWN_CC1 0
+
+/* Whether to enable opaque pointers by default */
+#define CLANG_ENABLE_OPAQUE_POINTERS_INTERNAL 0
 
 #endif

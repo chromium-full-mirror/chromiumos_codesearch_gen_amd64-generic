@@ -208,7 +208,7 @@ static void InitDefaultsscc_info_TerminalParams_apps_2eproto() {
 
 namespace vm_tools {
 namespace apps {
-bool ApplicationList_VmType_IsValid(int value) {
+bool VmType_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:
@@ -222,9 +222,9 @@ bool ApplicationList_VmType_IsValid(int value) {
   }
 }
 
-static ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<std::string> ApplicationList_VmType_strings[6] = {};
+static ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<std::string> VmType_strings[6] = {};
 
-static const char ApplicationList_VmType_names[] =
+static const char VmType_names[] =
   "ARCVM"
   "BOREALIS"
   "BRUSCHETTA"
@@ -232,16 +232,16 @@ static const char ApplicationList_VmType_names[] =
   "TERMINA"
   "UNKNOWN";
 
-static const ::PROTOBUF_NAMESPACE_ID::internal::EnumEntry ApplicationList_VmType_entries[] = {
-  { {ApplicationList_VmType_names + 0, 5}, 5 },
-  { {ApplicationList_VmType_names + 5, 8}, 2 },
-  { {ApplicationList_VmType_names + 13, 10}, 3 },
-  { {ApplicationList_VmType_names + 23, 9}, 1 },
-  { {ApplicationList_VmType_names + 32, 7}, 0 },
-  { {ApplicationList_VmType_names + 39, 7}, 4 },
+static const ::PROTOBUF_NAMESPACE_ID::internal::EnumEntry VmType_entries[] = {
+  { {VmType_names + 0, 5}, 5 },
+  { {VmType_names + 5, 8}, 2 },
+  { {VmType_names + 13, 10}, 3 },
+  { {VmType_names + 23, 9}, 1 },
+  { {VmType_names + 32, 7}, 0 },
+  { {VmType_names + 39, 7}, 4 },
 };
 
-static const int ApplicationList_VmType_entries_by_number[] = {
+static const int VmType_entries_by_number[] = {
   4, // 0 -> TERMINA
   3, // 1 -> PLUGIN_VM
   1, // 2 -> BOREALIS
@@ -250,42 +250,31 @@ static const int ApplicationList_VmType_entries_by_number[] = {
   0, // 5 -> ARCVM
 };
 
-const std::string& ApplicationList_VmType_Name(
-    ApplicationList_VmType value) {
+const std::string& VmType_Name(
+    VmType value) {
   static const bool dummy =
       ::PROTOBUF_NAMESPACE_ID::internal::InitializeEnumStrings(
-          ApplicationList_VmType_entries,
-          ApplicationList_VmType_entries_by_number,
-          6, ApplicationList_VmType_strings);
+          VmType_entries,
+          VmType_entries_by_number,
+          6, VmType_strings);
   (void) dummy;
   int idx = ::PROTOBUF_NAMESPACE_ID::internal::LookUpEnumName(
-      ApplicationList_VmType_entries,
-      ApplicationList_VmType_entries_by_number,
+      VmType_entries,
+      VmType_entries_by_number,
       6, value);
   return idx == -1 ? ::PROTOBUF_NAMESPACE_ID::internal::GetEmptyString() :
-                     ApplicationList_VmType_strings[idx].get();
+                     VmType_strings[idx].get();
 }
-bool ApplicationList_VmType_Parse(
-    const std::string& name, ApplicationList_VmType* value) {
+bool VmType_Parse(
+    const std::string& name, VmType* value) {
   int int_value;
   bool success = ::PROTOBUF_NAMESPACE_ID::internal::LookUpEnumValue(
-      ApplicationList_VmType_entries, 6, name, &int_value);
+      VmType_entries, 6, name, &int_value);
   if (success) {
-    *value = static_cast<ApplicationList_VmType>(int_value);
+    *value = static_cast<VmType>(int_value);
   }
   return success;
 }
-#if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
-constexpr ApplicationList_VmType ApplicationList::TERMINA;
-constexpr ApplicationList_VmType ApplicationList::PLUGIN_VM;
-constexpr ApplicationList_VmType ApplicationList::BOREALIS;
-constexpr ApplicationList_VmType ApplicationList::BRUSCHETTA;
-constexpr ApplicationList_VmType ApplicationList::UNKNOWN;
-constexpr ApplicationList_VmType ApplicationList::ARCVM;
-constexpr ApplicationList_VmType ApplicationList::VmType_MIN;
-constexpr ApplicationList_VmType ApplicationList::VmType_MAX;
-constexpr int ApplicationList::VmType_ARRAYSIZE;
-#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 
 // ===================================================================
 
@@ -1788,12 +1777,12 @@ const char* ApplicationList::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .vm_tools.apps.ApplicationList.VmType vm_type = 5;
+      // .vm_tools.apps.VmType vm_type = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
           ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
-          _internal_set_vm_type(static_cast<::vm_tools::apps::ApplicationList_VmType>(val));
+          _internal_set_vm_type(static_cast<::vm_tools::apps::VmType>(val));
         } else goto handle_unusual;
         continue;
       default: {
@@ -1860,7 +1849,7 @@ failure:
         4, this->_internal_owner_id(), target);
   }
 
-  // .vm_tools.apps.ApplicationList.VmType vm_type = 5;
+  // .vm_tools.apps.VmType vm_type = 5;
   if (this->vm_type() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
@@ -1911,7 +1900,7 @@ size_t ApplicationList::ByteSizeLong() const {
         this->_internal_owner_id());
   }
 
-  // .vm_tools.apps.ApplicationList.VmType vm_type = 5;
+  // .vm_tools.apps.VmType vm_type = 5;
   if (this->vm_type() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_vm_type());

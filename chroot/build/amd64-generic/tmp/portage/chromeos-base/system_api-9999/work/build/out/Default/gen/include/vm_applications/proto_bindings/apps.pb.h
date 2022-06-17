@@ -104,31 +104,31 @@ PROTOBUF_NAMESPACE_CLOSE
 namespace vm_tools {
 namespace apps {
 
-enum ApplicationList_VmType : int {
-  ApplicationList_VmType_TERMINA = 0,
-  ApplicationList_VmType_PLUGIN_VM = 1,
-  ApplicationList_VmType_BOREALIS = 2,
-  ApplicationList_VmType_BRUSCHETTA = 3,
-  ApplicationList_VmType_UNKNOWN = 4,
-  ApplicationList_VmType_ARCVM = 5,
-  ApplicationList_VmType_ApplicationList_VmType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
-  ApplicationList_VmType_ApplicationList_VmType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+enum VmType : int {
+  TERMINA = 0,
+  PLUGIN_VM = 1,
+  BOREALIS = 2,
+  BRUSCHETTA = 3,
+  UNKNOWN = 4,
+  ARCVM = 5,
+  VmType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  VmType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
 };
-bool ApplicationList_VmType_IsValid(int value);
-constexpr ApplicationList_VmType ApplicationList_VmType_VmType_MIN = ApplicationList_VmType_TERMINA;
-constexpr ApplicationList_VmType ApplicationList_VmType_VmType_MAX = ApplicationList_VmType_ARCVM;
-constexpr int ApplicationList_VmType_VmType_ARRAYSIZE = ApplicationList_VmType_VmType_MAX + 1;
+bool VmType_IsValid(int value);
+constexpr VmType VmType_MIN = TERMINA;
+constexpr VmType VmType_MAX = ARCVM;
+constexpr int VmType_ARRAYSIZE = VmType_MAX + 1;
 
-const std::string& ApplicationList_VmType_Name(ApplicationList_VmType value);
+const std::string& VmType_Name(VmType value);
 template<typename T>
-inline const std::string& ApplicationList_VmType_Name(T enum_t_value) {
-  static_assert(::std::is_same<T, ApplicationList_VmType>::value ||
+inline const std::string& VmType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, VmType>::value ||
     ::std::is_integral<T>::value,
-    "Incorrect type passed to function ApplicationList_VmType_Name.");
-  return ApplicationList_VmType_Name(static_cast<ApplicationList_VmType>(enum_t_value));
+    "Incorrect type passed to function VmType_Name.");
+  return VmType_Name(static_cast<VmType>(enum_t_value));
 }
-bool ApplicationList_VmType_Parse(
-    const std::string& name, ApplicationList_VmType* value);
+bool VmType_Parse(
+    const std::string& name, VmType* value);
 // ===================================================================
 
 class App_LocaleString_Entry :
@@ -1071,40 +1071,6 @@ class ApplicationList :
 
   // nested types ----------------------------------------------------
 
-  typedef ApplicationList_VmType VmType;
-  static constexpr VmType TERMINA =
-    ApplicationList_VmType_TERMINA;
-  static constexpr VmType PLUGIN_VM =
-    ApplicationList_VmType_PLUGIN_VM;
-  static constexpr VmType BOREALIS =
-    ApplicationList_VmType_BOREALIS;
-  static constexpr VmType BRUSCHETTA =
-    ApplicationList_VmType_BRUSCHETTA;
-  static constexpr VmType UNKNOWN =
-    ApplicationList_VmType_UNKNOWN;
-  static constexpr VmType ARCVM =
-    ApplicationList_VmType_ARCVM;
-  static inline bool VmType_IsValid(int value) {
-    return ApplicationList_VmType_IsValid(value);
-  }
-  static constexpr VmType VmType_MIN =
-    ApplicationList_VmType_VmType_MIN;
-  static constexpr VmType VmType_MAX =
-    ApplicationList_VmType_VmType_MAX;
-  static constexpr int VmType_ARRAYSIZE =
-    ApplicationList_VmType_VmType_ARRAYSIZE;
-  template<typename T>
-  static inline const std::string& VmType_Name(T enum_t_value) {
-    static_assert(::std::is_same<T, VmType>::value ||
-      ::std::is_integral<T>::value,
-      "Incorrect type passed to function VmType_Name.");
-    return ApplicationList_VmType_Name(enum_t_value);
-  }
-  static inline bool VmType_Parse(const std::string& name,
-      VmType* value) {
-    return ApplicationList_VmType_Parse(name, value);
-  }
-
   // accessors -------------------------------------------------------
 
   enum : int {
@@ -1180,13 +1146,13 @@ class ApplicationList :
   std::string* _internal_mutable_owner_id();
   public:
 
-  // .vm_tools.apps.ApplicationList.VmType vm_type = 5;
+  // .vm_tools.apps.VmType vm_type = 5;
   void clear_vm_type();
-  ::vm_tools::apps::ApplicationList_VmType vm_type() const;
-  void set_vm_type(::vm_tools::apps::ApplicationList_VmType value);
+  ::vm_tools::apps::VmType vm_type() const;
+  void set_vm_type(::vm_tools::apps::VmType value);
   private:
-  ::vm_tools::apps::ApplicationList_VmType _internal_vm_type() const;
-  void _internal_set_vm_type(::vm_tools::apps::ApplicationList_VmType value);
+  ::vm_tools::apps::VmType _internal_vm_type() const;
+  void _internal_set_vm_type(::vm_tools::apps::VmType value);
   public:
 
   // @@protoc_insertion_point(class_scope:vm_tools.apps.ApplicationList)
@@ -3104,22 +3070,22 @@ inline void ApplicationList::set_allocated_owner_id(std::string* owner_id) {
   // @@protoc_insertion_point(field_set_allocated:vm_tools.apps.ApplicationList.owner_id)
 }
 
-// .vm_tools.apps.ApplicationList.VmType vm_type = 5;
+// .vm_tools.apps.VmType vm_type = 5;
 inline void ApplicationList::clear_vm_type() {
   vm_type_ = 0;
 }
-inline ::vm_tools::apps::ApplicationList_VmType ApplicationList::_internal_vm_type() const {
-  return static_cast< ::vm_tools::apps::ApplicationList_VmType >(vm_type_);
+inline ::vm_tools::apps::VmType ApplicationList::_internal_vm_type() const {
+  return static_cast< ::vm_tools::apps::VmType >(vm_type_);
 }
-inline ::vm_tools::apps::ApplicationList_VmType ApplicationList::vm_type() const {
+inline ::vm_tools::apps::VmType ApplicationList::vm_type() const {
   // @@protoc_insertion_point(field_get:vm_tools.apps.ApplicationList.vm_type)
   return _internal_vm_type();
 }
-inline void ApplicationList::_internal_set_vm_type(::vm_tools::apps::ApplicationList_VmType value) {
+inline void ApplicationList::_internal_set_vm_type(::vm_tools::apps::VmType value) {
   
   vm_type_ = value;
 }
-inline void ApplicationList::set_vm_type(::vm_tools::apps::ApplicationList_VmType value) {
+inline void ApplicationList::set_vm_type(::vm_tools::apps::VmType value) {
   _internal_set_vm_type(value);
   // @@protoc_insertion_point(field_set:vm_tools.apps.ApplicationList.vm_type)
 }
@@ -4170,7 +4136,7 @@ inline void SelectFileRequest::set_allocated_allowed_extensions(std::string* all
 
 PROTOBUF_NAMESPACE_OPEN
 
-template <> struct is_proto_enum< ::vm_tools::apps::ApplicationList_VmType> : ::std::true_type {};
+template <> struct is_proto_enum< ::vm_tools::apps::VmType> : ::std::true_type {};
 
 PROTOBUF_NAMESPACE_CLOSE
 

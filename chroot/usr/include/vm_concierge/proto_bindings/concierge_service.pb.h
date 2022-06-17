@@ -385,6 +385,29 @@ inline const std::string& StartVmRequest_TerminaFeature_Name(T enum_t_value) {
 }
 bool StartVmRequest_TerminaFeature_Parse(
     const std::string& name, StartVmRequest_TerminaFeature* value);
+enum StartArcVmRequest_DisplayOrientation : int {
+  StartArcVmRequest_DisplayOrientation_ORIENTATION_0 = 0,
+  StartArcVmRequest_DisplayOrientation_ORIENTATION_90 = 1,
+  StartArcVmRequest_DisplayOrientation_ORIENTATION_180 = 2,
+  StartArcVmRequest_DisplayOrientation_ORIENTATION_270 = 3,
+  StartArcVmRequest_DisplayOrientation_StartArcVmRequest_DisplayOrientation_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  StartArcVmRequest_DisplayOrientation_StartArcVmRequest_DisplayOrientation_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool StartArcVmRequest_DisplayOrientation_IsValid(int value);
+constexpr StartArcVmRequest_DisplayOrientation StartArcVmRequest_DisplayOrientation_DisplayOrientation_MIN = StartArcVmRequest_DisplayOrientation_ORIENTATION_0;
+constexpr StartArcVmRequest_DisplayOrientation StartArcVmRequest_DisplayOrientation_DisplayOrientation_MAX = StartArcVmRequest_DisplayOrientation_ORIENTATION_270;
+constexpr int StartArcVmRequest_DisplayOrientation_DisplayOrientation_ARRAYSIZE = StartArcVmRequest_DisplayOrientation_DisplayOrientation_MAX + 1;
+
+const std::string& StartArcVmRequest_DisplayOrientation_Name(StartArcVmRequest_DisplayOrientation value);
+template<typename T>
+inline const std::string& StartArcVmRequest_DisplayOrientation_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, StartArcVmRequest_DisplayOrientation>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function StartArcVmRequest_DisplayOrientation_Name.");
+  return StartArcVmRequest_DisplayOrientation_Name(static_cast<StartArcVmRequest_DisplayOrientation>(enum_t_value));
+}
+bool StartArcVmRequest_DisplayOrientation_Parse(
+    const std::string& name, StartArcVmRequest_DisplayOrientation* value);
 enum StartVmResponse_MountResult : int {
   StartVmResponse_MountResult_UNKNOWN = 0,
   StartVmResponse_MountResult_SUCCESS = 1,
@@ -2161,9 +2184,6 @@ class BalloonPolicyOptions :
     kReclaimTargetCacheFieldNumber = 1,
     kCriticalTargetCacheFieldNumber = 2,
     kModerateTargetCacheFieldNumber = 3,
-    kResponsiveFieldNumber = 4,
-    kResponsiveTimeoutMsFieldNumber = 5,
-    kResponsiveMaxDeflateBytesFieldNumber = 6,
   };
   // int64 reclaim_target_cache = 1;
   void clear_reclaim_target_cache();
@@ -2192,33 +2212,6 @@ class BalloonPolicyOptions :
   void _internal_set_moderate_target_cache(::PROTOBUF_NAMESPACE_ID::int64 value);
   public:
 
-  // bool responsive = 4;
-  void clear_responsive();
-  bool responsive() const;
-  void set_responsive(bool value);
-  private:
-  bool _internal_responsive() const;
-  void _internal_set_responsive(bool value);
-  public:
-
-  // int32 responsive_timeout_ms = 5;
-  void clear_responsive_timeout_ms();
-  ::PROTOBUF_NAMESPACE_ID::int32 responsive_timeout_ms() const;
-  void set_responsive_timeout_ms(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_responsive_timeout_ms() const;
-  void _internal_set_responsive_timeout_ms(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
-  // int64 responsive_max_deflate_bytes = 6;
-  void clear_responsive_max_deflate_bytes();
-  ::PROTOBUF_NAMESPACE_ID::int64 responsive_max_deflate_bytes() const;
-  void set_responsive_max_deflate_bytes(::PROTOBUF_NAMESPACE_ID::int64 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int64 _internal_responsive_max_deflate_bytes() const;
-  void _internal_set_responsive_max_deflate_bytes(::PROTOBUF_NAMESPACE_ID::int64 value);
-  public:
-
   // @@protoc_insertion_point(class_scope:vm_tools.concierge.BalloonPolicyOptions)
  private:
   class _Internal;
@@ -2227,9 +2220,6 @@ class BalloonPolicyOptions :
   ::PROTOBUF_NAMESPACE_ID::int64 reclaim_target_cache_;
   ::PROTOBUF_NAMESPACE_ID::int64 critical_target_cache_;
   ::PROTOBUF_NAMESPACE_ID::int64 moderate_target_cache_;
-  bool responsive_;
-  ::PROTOBUF_NAMESPACE_ID::int32 responsive_timeout_ms_;
-  ::PROTOBUF_NAMESPACE_ID::int64 responsive_max_deflate_bytes_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_concierge_5fservice_2eproto;
 };
@@ -2323,6 +2313,36 @@ class StartArcVmRequest :
 
   // nested types ----------------------------------------------------
 
+  typedef StartArcVmRequest_DisplayOrientation DisplayOrientation;
+  static constexpr DisplayOrientation ORIENTATION_0 =
+    StartArcVmRequest_DisplayOrientation_ORIENTATION_0;
+  static constexpr DisplayOrientation ORIENTATION_90 =
+    StartArcVmRequest_DisplayOrientation_ORIENTATION_90;
+  static constexpr DisplayOrientation ORIENTATION_180 =
+    StartArcVmRequest_DisplayOrientation_ORIENTATION_180;
+  static constexpr DisplayOrientation ORIENTATION_270 =
+    StartArcVmRequest_DisplayOrientation_ORIENTATION_270;
+  static inline bool DisplayOrientation_IsValid(int value) {
+    return StartArcVmRequest_DisplayOrientation_IsValid(value);
+  }
+  static constexpr DisplayOrientation DisplayOrientation_MIN =
+    StartArcVmRequest_DisplayOrientation_DisplayOrientation_MIN;
+  static constexpr DisplayOrientation DisplayOrientation_MAX =
+    StartArcVmRequest_DisplayOrientation_DisplayOrientation_MAX;
+  static constexpr int DisplayOrientation_ARRAYSIZE =
+    StartArcVmRequest_DisplayOrientation_DisplayOrientation_ARRAYSIZE;
+  template<typename T>
+  static inline const std::string& DisplayOrientation_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, DisplayOrientation>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function DisplayOrientation_Name.");
+    return StartArcVmRequest_DisplayOrientation_Name(enum_t_value);
+  }
+  static inline bool DisplayOrientation_Parse(const std::string& name,
+      DisplayOrientation* value) {
+    return StartArcVmRequest_DisplayOrientation_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   enum : int {
@@ -2342,6 +2362,7 @@ class StartArcVmRequest :
     kRootfsBlockSizeFieldNumber = 15,
     kUsePerVmCoreSchedulingFieldNumber = 14,
     kEnableConsumerAutoUpdateToggleFieldNumber = 16,
+    kPanelOrientationFieldNumber = 17,
   };
   // repeated .vm_tools.concierge.DiskImage disks = 2;
   int disks_size() const;
@@ -2544,6 +2565,15 @@ class StartArcVmRequest :
   void _internal_set_enable_consumer_auto_update_toggle(bool value);
   public:
 
+  // .vm_tools.concierge.StartArcVmRequest.DisplayOrientation panel_orientation = 17;
+  void clear_panel_orientation();
+  ::vm_tools::concierge::StartArcVmRequest_DisplayOrientation panel_orientation() const;
+  void set_panel_orientation(::vm_tools::concierge::StartArcVmRequest_DisplayOrientation value);
+  private:
+  ::vm_tools::concierge::StartArcVmRequest_DisplayOrientation _internal_panel_orientation() const;
+  void _internal_set_panel_orientation(::vm_tools::concierge::StartArcVmRequest_DisplayOrientation value);
+  public:
+
   // @@protoc_insertion_point(class_scope:vm_tools.concierge.StartArcVmRequest)
  private:
   class _Internal;
@@ -2565,6 +2595,7 @@ class StartArcVmRequest :
   ::PROTOBUF_NAMESPACE_ID::uint32 rootfs_block_size_;
   bool use_per_vm_core_scheduling_;
   bool enable_consumer_auto_update_toggle_;
+  int panel_orientation_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_concierge_5fservice_2eproto;
 };
@@ -12785,66 +12816,6 @@ inline void BalloonPolicyOptions::set_moderate_target_cache(::PROTOBUF_NAMESPACE
   // @@protoc_insertion_point(field_set:vm_tools.concierge.BalloonPolicyOptions.moderate_target_cache)
 }
 
-// bool responsive = 4;
-inline void BalloonPolicyOptions::clear_responsive() {
-  responsive_ = false;
-}
-inline bool BalloonPolicyOptions::_internal_responsive() const {
-  return responsive_;
-}
-inline bool BalloonPolicyOptions::responsive() const {
-  // @@protoc_insertion_point(field_get:vm_tools.concierge.BalloonPolicyOptions.responsive)
-  return _internal_responsive();
-}
-inline void BalloonPolicyOptions::_internal_set_responsive(bool value) {
-  
-  responsive_ = value;
-}
-inline void BalloonPolicyOptions::set_responsive(bool value) {
-  _internal_set_responsive(value);
-  // @@protoc_insertion_point(field_set:vm_tools.concierge.BalloonPolicyOptions.responsive)
-}
-
-// int32 responsive_timeout_ms = 5;
-inline void BalloonPolicyOptions::clear_responsive_timeout_ms() {
-  responsive_timeout_ms_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 BalloonPolicyOptions::_internal_responsive_timeout_ms() const {
-  return responsive_timeout_ms_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 BalloonPolicyOptions::responsive_timeout_ms() const {
-  // @@protoc_insertion_point(field_get:vm_tools.concierge.BalloonPolicyOptions.responsive_timeout_ms)
-  return _internal_responsive_timeout_ms();
-}
-inline void BalloonPolicyOptions::_internal_set_responsive_timeout_ms(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  responsive_timeout_ms_ = value;
-}
-inline void BalloonPolicyOptions::set_responsive_timeout_ms(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_responsive_timeout_ms(value);
-  // @@protoc_insertion_point(field_set:vm_tools.concierge.BalloonPolicyOptions.responsive_timeout_ms)
-}
-
-// int64 responsive_max_deflate_bytes = 6;
-inline void BalloonPolicyOptions::clear_responsive_max_deflate_bytes() {
-  responsive_max_deflate_bytes_ = PROTOBUF_LONGLONG(0);
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 BalloonPolicyOptions::_internal_responsive_max_deflate_bytes() const {
-  return responsive_max_deflate_bytes_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 BalloonPolicyOptions::responsive_max_deflate_bytes() const {
-  // @@protoc_insertion_point(field_get:vm_tools.concierge.BalloonPolicyOptions.responsive_max_deflate_bytes)
-  return _internal_responsive_max_deflate_bytes();
-}
-inline void BalloonPolicyOptions::_internal_set_responsive_max_deflate_bytes(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  
-  responsive_max_deflate_bytes_ = value;
-}
-inline void BalloonPolicyOptions::set_responsive_max_deflate_bytes(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  _internal_set_responsive_max_deflate_bytes(value);
-  // @@protoc_insertion_point(field_set:vm_tools.concierge.BalloonPolicyOptions.responsive_max_deflate_bytes)
-}
-
 // -------------------------------------------------------------------
 
 // StartArcVmRequest
@@ -13440,6 +13411,26 @@ inline void StartArcVmRequest::_internal_set_enable_consumer_auto_update_toggle(
 inline void StartArcVmRequest::set_enable_consumer_auto_update_toggle(bool value) {
   _internal_set_enable_consumer_auto_update_toggle(value);
   // @@protoc_insertion_point(field_set:vm_tools.concierge.StartArcVmRequest.enable_consumer_auto_update_toggle)
+}
+
+// .vm_tools.concierge.StartArcVmRequest.DisplayOrientation panel_orientation = 17;
+inline void StartArcVmRequest::clear_panel_orientation() {
+  panel_orientation_ = 0;
+}
+inline ::vm_tools::concierge::StartArcVmRequest_DisplayOrientation StartArcVmRequest::_internal_panel_orientation() const {
+  return static_cast< ::vm_tools::concierge::StartArcVmRequest_DisplayOrientation >(panel_orientation_);
+}
+inline ::vm_tools::concierge::StartArcVmRequest_DisplayOrientation StartArcVmRequest::panel_orientation() const {
+  // @@protoc_insertion_point(field_get:vm_tools.concierge.StartArcVmRequest.panel_orientation)
+  return _internal_panel_orientation();
+}
+inline void StartArcVmRequest::_internal_set_panel_orientation(::vm_tools::concierge::StartArcVmRequest_DisplayOrientation value) {
+  
+  panel_orientation_ = value;
+}
+inline void StartArcVmRequest::set_panel_orientation(::vm_tools::concierge::StartArcVmRequest_DisplayOrientation value) {
+  _internal_set_panel_orientation(value);
+  // @@protoc_insertion_point(field_set:vm_tools.concierge.StartArcVmRequest.panel_orientation)
 }
 
 // -------------------------------------------------------------------
@@ -21087,6 +21078,7 @@ PROTOBUF_NAMESPACE_OPEN
 template <> struct is_proto_enum< ::vm_tools::concierge::VmInfo_VmType> : ::std::true_type {};
 template <> struct is_proto_enum< ::vm_tools::concierge::StartVmRequest_FdType> : ::std::true_type {};
 template <> struct is_proto_enum< ::vm_tools::concierge::StartVmRequest_TerminaFeature> : ::std::true_type {};
+template <> struct is_proto_enum< ::vm_tools::concierge::StartArcVmRequest_DisplayOrientation> : ::std::true_type {};
 template <> struct is_proto_enum< ::vm_tools::concierge::StartVmResponse_MountResult> : ::std::true_type {};
 template <> struct is_proto_enum< ::vm_tools::concierge::StartContainerRequest_PrivilegeLevel> : ::std::true_type {};
 template <> struct is_proto_enum< ::vm_tools::concierge::DiskImageType> : ::std::true_type {};
