@@ -108,8 +108,7 @@ TEST_F(RecoveryCryptoTpm2BackendTest, EncryptEccPrivateKeySuccess) {
   brillo::SecureBlob encrypted_privated_key;
   EXPECT_TRUE(recovery_crypto_tpm2_backend_->EncryptEccPrivateKey(
       ec_256_.value(), own_key_pair,
-      /*auth_value=*/std::nullopt, /*obfuscated_username=*/"",
-      &encrypted_privated_key));
+      /*auth_value=*/std::nullopt, &encrypted_privated_key));
   EXPECT_EQ(encrypted_privated_key.to_string(),
             expected_encrypted_own_priv_key);
 }
@@ -131,8 +130,7 @@ TEST_F(RecoveryCryptoTpm2BackendTest,
   // the input key pair is not on the elliptic curve 521
   EXPECT_FALSE(recovery_crypto_tpm2_backend_->EncryptEccPrivateKey(
       ec_521_.value(), own_key_pair,
-      /*auth_value=*/std::nullopt, /*obfuscated_username=*/"",
-      &encrypted_privated_key));
+      /*auth_value=*/std::nullopt, &encrypted_privated_key));
   EXPECT_EQ(encrypted_privated_key.to_string(), "");
 }
 
@@ -151,8 +149,7 @@ TEST_F(RecoveryCryptoTpm2BackendTest, EncryptEccPrivateKeyWithSessionFailure) {
   brillo::SecureBlob encrypted_privated_key;
   EXPECT_FALSE(recovery_crypto_tpm2_backend_->EncryptEccPrivateKey(
       ec_256_.value(), own_key_pair,
-      /*auth_value=*/std::nullopt, /*obfuscated_username=*/"",
-      &encrypted_privated_key));
+      /*auth_value=*/std::nullopt, &encrypted_privated_key));
   EXPECT_EQ(encrypted_privated_key.to_string(), "");
 }
 
@@ -173,8 +170,7 @@ TEST_F(RecoveryCryptoTpm2BackendTest,
   brillo::SecureBlob encrypted_privated_key;
   EXPECT_FALSE(recovery_crypto_tpm2_backend_->EncryptEccPrivateKey(
       ec_256_.value(), own_key_pair,
-      /*auth_value=*/std::nullopt, /*obfuscated_username=*/"",
-      &encrypted_privated_key));
+      /*auth_value=*/std::nullopt, &encrypted_privated_key));
   EXPECT_EQ(encrypted_privated_key.to_string(), "");
 }
 
@@ -215,8 +211,7 @@ TEST_F(RecoveryCryptoTpm2BackendTest,
   crypto::ScopedEC_POINT shared_secret_point =
       recovery_crypto_tpm2_backend_->GenerateDiffieHellmanSharedSecret(
           ec_256_.value(), /*encrypted_own_priv_key=*/brillo::SecureBlob(),
-          /*auth_value=*/std::nullopt, /*obfuscated_username=*/"",
-          *others_pub_key);
+          /*auth_value=*/std::nullopt, *others_pub_key);
   EXPECT_NE(nullptr, shared_secret_point);
   EXPECT_TRUE(ec_256_->AreEqual(*shared_secret_point,
                                 *expected_shared_secret_point, context_.get()));
@@ -242,8 +237,7 @@ TEST_F(RecoveryCryptoTpm2BackendTest,
   crypto::ScopedEC_POINT shared_secret_point =
       recovery_crypto_tpm2_backend_->GenerateDiffieHellmanSharedSecret(
           ec_521_.value(), /*encrypted_own_priv_key=*/brillo::SecureBlob(),
-          /*auth_value=*/std::nullopt, /*obfuscated_username=*/"",
-          *others_pub_key);
+          /*auth_value=*/std::nullopt, *others_pub_key);
   EXPECT_EQ(nullptr, shared_secret_point);
 }
 
@@ -266,8 +260,7 @@ TEST_F(RecoveryCryptoTpm2BackendTest,
   crypto::ScopedEC_POINT shared_secret_point =
       recovery_crypto_tpm2_backend_->GenerateDiffieHellmanSharedSecret(
           ec_256_.value(), /*encrypted_own_priv_key=*/brillo::SecureBlob(),
-          /*auth_value=*/std::nullopt, /*obfuscated_username=*/"",
-          *others_pub_key);
+          /*auth_value=*/std::nullopt, *others_pub_key);
   EXPECT_EQ(nullptr, shared_secret_point);
 }
 
@@ -292,8 +285,7 @@ TEST_F(RecoveryCryptoTpm2BackendTest,
   crypto::ScopedEC_POINT shared_secret_point =
       recovery_crypto_tpm2_backend_->GenerateDiffieHellmanSharedSecret(
           ec_256_.value(), /*encrypted_own_priv_key=*/brillo::SecureBlob(),
-          /*auth_value=*/std::nullopt, /*obfuscated_username=*/"",
-          *others_pub_key);
+          /*auth_value=*/std::nullopt, *others_pub_key);
   EXPECT_EQ(nullptr, shared_secret_point);
 }
 
@@ -320,8 +312,7 @@ TEST_F(RecoveryCryptoTpm2BackendTest,
   crypto::ScopedEC_POINT shared_secret_point =
       recovery_crypto_tpm2_backend_->GenerateDiffieHellmanSharedSecret(
           ec_256_.value(), /*encrypted_own_priv_key=*/brillo::SecureBlob(),
-          /*auth_value=*/std::nullopt, /*obfuscated_username=*/"",
-          *others_pub_key);
+          /*auth_value=*/std::nullopt, *others_pub_key);
   EXPECT_EQ(nullptr, shared_secret_point);
 }
 

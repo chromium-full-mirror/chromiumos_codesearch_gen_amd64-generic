@@ -7,7 +7,6 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <vector>
 
 #include <base/check.h>
 #include <base/logging.h>
@@ -49,7 +48,6 @@ bool RecoveryCryptoTpm2BackendImpl::EncryptEccPrivateKey(
     const EllipticCurve& ec,
     const crypto::ScopedEC_KEY& own_key_pair,
     const std::optional<brillo::SecureBlob>& /*auth_value*/,
-    const std::string& obfuscated_username,
     brillo::SecureBlob* encrypted_own_priv_key) {
   DCHECK(encrypted_own_priv_key);
 
@@ -160,7 +158,6 @@ RecoveryCryptoTpm2BackendImpl::GenerateDiffieHellmanSharedSecret(
     const EllipticCurve& ec,
     const brillo::SecureBlob& encrypted_own_priv_key,
     const std::optional<brillo::SecureBlob>& /*auth_value*/,
-    const std::string& obfuscated_username,
     const EC_POINT& others_pub_point) {
   ScopedBN_CTX context = CreateBigNumContext();
   if (!context.get()) {
