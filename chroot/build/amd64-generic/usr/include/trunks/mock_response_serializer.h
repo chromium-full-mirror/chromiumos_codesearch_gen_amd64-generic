@@ -31,10 +31,6 @@ class MockResponseSerializer : public ResponseSerializer {
               SerializeResponseNvRead,
               (const TPM2B_MAX_NV_BUFFER&, std::string*),
               (override));
-  MOCK_METHOD(void,
-              SerializeResponseNvReadPublic,
-              (const TPM2B_NV_PUBLIC&, const TPM2B_NAME&, std::string*),
-              (override));
 };
 }  // namespace trunks
 
