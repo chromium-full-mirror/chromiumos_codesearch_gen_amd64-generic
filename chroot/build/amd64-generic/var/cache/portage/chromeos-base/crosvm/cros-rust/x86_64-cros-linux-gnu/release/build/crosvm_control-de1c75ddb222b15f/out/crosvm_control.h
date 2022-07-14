@@ -92,6 +92,11 @@ bool crosvm_client_make_rt_vm(const char *socket_path);
 bool crosvm_client_balloon_vms(const char *socket_path, uint64_t num_bytes);
 
 /**
+ * Simply returns the maximum possible number of USB devices
+ */
+uintptr_t crosvm_client_max_usb_devices(void);
+
+/**
  * Returns all USB devices passed through the crosvm instance whose control socket is listening on `socket_path`.
  *
  * The function returns the amount of entries written.
@@ -102,8 +107,8 @@ bool crosvm_client_balloon_vms(const char *socket_path, uint64_t num_bytes);
  *               devices will be written to
  * * `entries_length` - Amount of entries in the array specified by `entries`
  *
- * Crosvm supports passing through up to 255 devices, so pasing an array with 255 entries will
- * guarantee to return all entries.
+ * Use the value returned by crosvm_client_max_usb_devices() to determine the size of the input
+ * array to this function.
  */
 ssize_t crosvm_client_usb_list(const char *socket_path,
                                struct UsbDeviceEntry *entries,
