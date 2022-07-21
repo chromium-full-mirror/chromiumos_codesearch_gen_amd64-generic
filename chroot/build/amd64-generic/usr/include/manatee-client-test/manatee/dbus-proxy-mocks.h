@@ -1,7 +1,7 @@
 // Automatic generation of D-Bus interface mock proxies for:
 //  - org.chromium.ManaTEEInterface
-#ifndef ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R256_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXY_MOCKS_H
-#define ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R256_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXY_MOCKS_H
+#ifndef ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R261_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXY_MOCKS_H
+#define ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R261_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXY_MOCKS_H
 #include <string>
 #include <vector>
 
@@ -24,18 +24,17 @@ class ManaTEEInterfaceProxyMock : public ManaTEEInterfaceProxyInterface {
   ManaTEEInterfaceProxyMock(const ManaTEEInterfaceProxyMock&) = delete;
   ManaTEEInterfaceProxyMock& operator=(const ManaTEEInterfaceProxyMock&) = delete;
 
-  MOCK_METHOD7(StartTEEApplication,
+  MOCK_METHOD6(StartTEEApplication,
                bool(const std::string& /*in_app_id*/,
                     const std::vector<std::string>& /*in_args*/,
                     int32_t* /*out_error_code*/,
-                    base::ScopedFD* /*out_fd_in*/,
-                    base::ScopedFD* /*out_fd_out*/,
+                    std::vector<base::ScopedFD>* /*out_fd*/,
                     brillo::ErrorPtr* /*error*/,
                     int /*timeout_ms*/));
   MOCK_METHOD5(StartTEEApplicationAsync,
                void(const std::string& /*in_app_id*/,
                     const std::vector<std::string>& /*in_args*/,
-                    base::OnceCallback<void(int32_t /*error_code*/, const base::ScopedFD& /*fd_in*/, const base::ScopedFD& /*fd_out*/)> /*success_callback*/,
+                    base::OnceCallback<void(int32_t /*error_code*/, const std::vector<base::ScopedFD>& /*fd*/)> /*success_callback*/,
                     base::OnceCallback<void(brillo::Error*)> /*error_callback*/,
                     int /*timeout_ms*/));
   MOCK_METHOD4(SystemEvent,
@@ -62,4 +61,4 @@ class ManaTEEInterfaceProxyMock : public ManaTEEInterfaceProxyInterface {
 }  // namespace chromium
 }  // namespace org
 
-#endif  // ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R256_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXY_MOCKS_H
+#endif  // ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R261_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXY_MOCKS_H
