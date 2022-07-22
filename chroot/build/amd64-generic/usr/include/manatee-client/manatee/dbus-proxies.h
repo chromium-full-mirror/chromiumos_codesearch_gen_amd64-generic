@@ -1,7 +1,7 @@
 // Automatic generation of D-Bus interfaces:
 //  - org.chromium.ManaTEEInterface
-#ifndef ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R256_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXIES_H
-#define ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R256_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXIES_H
+#ifndef ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R261_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXIES_H
+#define ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R261_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXIES_H
 #include <memory>
 #include <string>
 #include <vector>
@@ -36,15 +36,14 @@ class ManaTEEInterfaceProxyInterface {
       const std::string& in_app_id,
       const std::vector<std::string>& in_args,
       int32_t* out_error_code,
-      base::ScopedFD* out_fd_in,
-      base::ScopedFD* out_fd_out,
+      std::vector<base::ScopedFD>* out_fd,
       brillo::ErrorPtr* error,
       int timeout_ms = dbus::ObjectProxy::TIMEOUT_USE_DEFAULT) = 0;
 
   virtual void StartTEEApplicationAsync(
       const std::string& in_app_id,
       const std::vector<std::string>& in_args,
-      base::OnceCallback<void(int32_t /*error_code*/, const base::ScopedFD& /*fd_in*/, const base::ScopedFD& /*fd_out*/)> success_callback,
+      base::OnceCallback<void(int32_t /*error_code*/, const std::vector<base::ScopedFD>& /*fd*/)> success_callback,
       base::OnceCallback<void(brillo::Error*)> error_callback,
       int timeout_ms = dbus::ObjectProxy::TIMEOUT_USE_DEFAULT) = 0;
 
@@ -111,8 +110,7 @@ class ManaTEEInterfaceProxy final : public ManaTEEInterfaceProxyInterface {
       const std::string& in_app_id,
       const std::vector<std::string>& in_args,
       int32_t* out_error_code,
-      base::ScopedFD* out_fd_in,
-      base::ScopedFD* out_fd_out,
+      std::vector<base::ScopedFD>* out_fd,
       brillo::ErrorPtr* error,
       int timeout_ms = dbus::ObjectProxy::TIMEOUT_USE_DEFAULT) override {
     auto response = brillo::dbus_utils::CallMethodAndBlockWithTimeout(
@@ -124,13 +122,13 @@ class ManaTEEInterfaceProxy final : public ManaTEEInterfaceProxyInterface {
         in_app_id,
         in_args);
     return response && brillo::dbus_utils::ExtractMethodCallResults(
-        response.get(), error, out_error_code, out_fd_in, out_fd_out);
+        response.get(), error, out_error_code, out_fd);
   }
 
   void StartTEEApplicationAsync(
       const std::string& in_app_id,
       const std::vector<std::string>& in_args,
-      base::OnceCallback<void(int32_t /*error_code*/, const base::ScopedFD& /*fd_in*/, const base::ScopedFD& /*fd_out*/)> success_callback,
+      base::OnceCallback<void(int32_t /*error_code*/, const std::vector<base::ScopedFD>& /*fd*/)> success_callback,
       base::OnceCallback<void(brillo::Error*)> error_callback,
       int timeout_ms = dbus::ObjectProxy::TIMEOUT_USE_DEFAULT) override {
     brillo::dbus_utils::CallMethodWithTimeout(
@@ -213,4 +211,4 @@ class ManaTEEInterfaceProxy final : public ManaTEEInterfaceProxyInterface {
 }  // namespace chromium
 }  // namespace org
 
-#endif  // ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R256_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXIES_H
+#endif  // ____CHROMEOS_DBUS_BINDING___BUILD_AMD64_GENERIC_TMP_PORTAGE_CHROMEOS_BASE_MANATEE_CLIENT_0_0_1_R261_WORK_BUILD_OUT_DEFAULT_GEN_INCLUDE_MANATEE_DBUS_PROXIES_H
