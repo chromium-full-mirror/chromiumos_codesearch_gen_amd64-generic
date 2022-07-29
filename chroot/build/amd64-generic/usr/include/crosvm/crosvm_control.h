@@ -107,7 +107,7 @@ uintptr_t crosvm_client_max_usb_devices(void);
  *               devices will be written to
  * * `entries_length` - Amount of entries in the array specified by `entries`
  *
- * Use the value returned by crosvm_client_max_usb_devices() to determine the size of the input
+ * Use the value returned by [`crosvm_client_max_usb_devices()`] to determine the size of the input
  * array to this function.
  */
 ssize_t crosvm_client_usb_list(const char *socket_path,
