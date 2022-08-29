@@ -70,6 +70,9 @@ class MockTremplinStub : public Tremplin::StubInterface {
   MOCK_METHOD3(DetachUsbFromContainer, ::grpc::Status(::grpc::ClientContext* context, const ::vm_tools::tremplin::DetachUsbFromContainerRequest& request, ::vm_tools::tremplin::DetachUsbFromContainerResponse* response));
   MOCK_METHOD3(AsyncDetachUsbFromContainerRaw, ::grpc::ClientAsyncResponseReaderInterface< ::vm_tools::tremplin::DetachUsbFromContainerResponse>*(::grpc::ClientContext* context, const ::vm_tools::tremplin::DetachUsbFromContainerRequest& request, ::grpc::CompletionQueue* cq));
   MOCK_METHOD3(PrepareAsyncDetachUsbFromContainerRaw, ::grpc::ClientAsyncResponseReaderInterface< ::vm_tools::tremplin::DetachUsbFromContainerResponse>*(::grpc::ClientContext* context, const ::vm_tools::tremplin::DetachUsbFromContainerRequest& request, ::grpc::CompletionQueue* cq));
+  MOCK_METHOD3(UpdateContainerDevices, ::grpc::Status(::grpc::ClientContext* context, const ::vm_tools::tremplin::UpdateContainerDevicesRequest& request, ::vm_tools::tremplin::UpdateContainerDevicesResponse* response));
+  MOCK_METHOD3(AsyncUpdateContainerDevicesRaw, ::grpc::ClientAsyncResponseReaderInterface< ::vm_tools::tremplin::UpdateContainerDevicesResponse>*(::grpc::ClientContext* context, const ::vm_tools::tremplin::UpdateContainerDevicesRequest& request, ::grpc::CompletionQueue* cq));
+  MOCK_METHOD3(PrepareAsyncUpdateContainerDevicesRaw, ::grpc::ClientAsyncResponseReaderInterface< ::vm_tools::tremplin::UpdateContainerDevicesResponse>*(::grpc::ClientContext* context, const ::vm_tools::tremplin::UpdateContainerDevicesRequest& request, ::grpc::CompletionQueue* cq));
 };
 
 class MockTremplinListenerStub : public TremplinListener::StubInterface {
