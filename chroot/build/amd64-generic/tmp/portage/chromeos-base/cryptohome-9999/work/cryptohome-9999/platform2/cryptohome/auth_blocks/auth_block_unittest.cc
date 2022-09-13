@@ -13,13 +13,13 @@
 
 #include <base/files/file_path.h>
 #include <gtest/gtest.h>
-#include <libhwsec/error/elliptic_curve_error.h>
+#include <libhwsec/factory/tpm2_simulator_factory_for_test.h>
+#include <libhwsec/frontend/recovery_crypto/mock_frontend.h>
 #include <libhwsec-foundation/crypto/aes.h>
 #include <libhwsec-foundation/crypto/rsa.h>
 #include <libhwsec-foundation/crypto/scrypt.h>
 #include <libhwsec-foundation/error/testing_helper.h>
 
-#include "cryptohome/auth_blocks/auth_block_state.h"
 #include "cryptohome/auth_blocks/auth_block_utils.h"
 #include "cryptohome/auth_blocks/cryptohome_recovery_auth_block.h"
 #include "cryptohome/auth_blocks/double_wrapped_compat_auth_block.h"
@@ -31,13 +31,12 @@
 #include "cryptohome/crypto.h"
 #include "cryptohome/crypto_error.h"
 #include "cryptohome/cryptorecovery/fake_recovery_mediator_crypto.h"
-#include "cryptohome/cryptorecovery/recovery_crypto_fake_tpm_backend_impl.h"
 #include "cryptohome/cryptorecovery/recovery_crypto_hsm_cbor_serialization.h"
 #include "cryptohome/cryptorecovery/recovery_crypto_impl.h"
+#include "cryptohome/fake_platform.h"
+#include "cryptohome/flatbuffer_schemas/auth_block_state.h"
 #include "cryptohome/mock_cryptohome_keys_manager.h"
-#include "cryptohome/mock_le_credential_backend.h"
 #include "cryptohome/mock_le_credential_manager.h"
-#include "cryptohome/mock_tpm.h"
 #include "cryptohome/vault_keyset.h"
 
 using cryptohome::cryptorecovery::FakeRecoveryMediatorCrypto;
@@ -47,8 +46,6 @@ using cryptohome::error::CryptohomeLECredError;
 using cryptohome::error::ErrorAction;
 using cryptohome::error::ErrorActionSet;
 
-using ::hwsec::EllipticCurveError;
-using ::hwsec::EllipticCurveErrorCode;
 using ::hwsec::TPMError;
 using ::hwsec::TPMErrorBase;
 using ::hwsec::TPMRetryAction;
@@ -401,7 +398,7 @@ TEST(PinWeaverAuthBlockTest, CreateTest) {
   NiceMock<MockLECredentialManager> le_cred_manager;
   EXPECT_CALL(le_cred_manager, InsertCredential(_, _, _, _, _, _))
       .WillOnce(
-          DoAll(SaveArg<0>(&le_secret), ReturnError<CryptohomeLECredError>()));
+          DoAll(SaveArg<1>(&le_secret), ReturnError<CryptohomeLECredError>()));
 
   // Call the Create() method.
   AuthInput user_input = {vault_key,
@@ -690,6 +687,7 @@ TEST(PinWeaverAuthBlockTest, CheckCredentialFailureTest) {
           LECredError::LE_CRED_ERROR_INVALID_LE_SECRET));
   EXPECT_CALL(le_cred_manager, CheckCredential(_, le_secret, _, _))
       .Times(Exactly(1));
+  EXPECT_CALL(le_cred_manager, GetDelayInSeconds(_)).WillOnce(ReturnValue(0));
 
   NiceMock<hwsec::MockCryptohomeFrontend> hwsec;
   NiceMock<MockCryptohomeKeysManager> cryptohome_keys_manager;
@@ -766,6 +764,8 @@ TEST(PinWeaverAuthBlockTest, CheckCredentialNotFatalCryptoErrorTest) {
       .WillOnce(ReturnError<CryptohomeLECredError>(
           kErrorLocationForTesting1, ErrorActionSet({ErrorAction::kFatal}),
           LE_CRED_ERROR_PCR_NOT_MATCH));
+  EXPECT_CALL(le_cred_manager, GetDelayInSeconds(_))
+      .WillRepeatedly(ReturnValue(0));
 
   NiceMock<MockCryptohomeKeysManager> cryptohome_keys_manager;
   PinWeaverAuthBlock auth_block(&le_cred_manager, &cryptohome_keys_manager);
@@ -805,7 +805,6 @@ TEST(TPMAuthBlockTest, DecryptBoundToPcrTest) {
 
   NiceMock<hwsec::MockCryptohomeFrontend> hwsec;
   NiceMock<MockCryptohomeKeysManager> cryptohome_keys_manager;
-  ScopedKeyHandle handle;
 
   SetupMockHwsec(hwsec);
 
@@ -844,7 +843,6 @@ TEST(TPMAuthBlockTest, DecryptBoundToPcrNoPreloadTest) {
   NiceMock<hwsec::MockCryptohomeFrontend> hwsec;
   SetupMockHwsec(hwsec);
   NiceMock<MockCryptohomeKeysManager> cryptohome_keys_manager;
-  ScopedKeyHandle handle;
   EXPECT_CALL(hwsec, PreloadSealedData(_)).WillOnce(ReturnValue(std::nullopt));
   brillo::SecureBlob auth_value(256, 'a');
   EXPECT_CALL(hwsec, GetAuthValue(_, pass_blob))
@@ -857,6 +855,30 @@ TEST(TPMAuthBlockTest, DecryptBoundToPcrNoPreloadTest) {
 
   TpmBoundToPcrAuthBlock tpm_auth_block(&hwsec, &cryptohome_keys_manager);
   EXPECT_TRUE(
+      tpm_auth_block
+          .DecryptTpmBoundToPcr(vault_key, tpm_key, salt, &vkk_iv, &vkk_key)
+          .ok());
+}
+
+TEST(TPMAuthBlockTest, DecryptBoundToPcrPreloadFailedTest) {
+  brillo::SecureBlob vault_key(20, 'C');
+  brillo::SecureBlob tpm_key(20, 'B');
+  brillo::SecureBlob salt(PKCS5_SALT_LEN, 'A');
+
+  brillo::SecureBlob vkk_iv(kDefaultAesKeySize);
+  brillo::SecureBlob vkk_key;
+
+  brillo::SecureBlob pass_blob(kDefaultPassBlobSize);
+  ASSERT_TRUE(DeriveSecretsScrypt(vault_key, salt, {&pass_blob}));
+
+  NiceMock<hwsec::MockCryptohomeFrontend> hwsec;
+  SetupMockHwsec(hwsec);
+  NiceMock<MockCryptohomeKeysManager> cryptohome_keys_manager;
+  EXPECT_CALL(hwsec, PreloadSealedData(_))
+      .WillOnce(ReturnError<TPMError>("fake", TPMRetryAction::kNoRetry));
+
+  TpmBoundToPcrAuthBlock tpm_auth_block(&hwsec, &cryptohome_keys_manager);
+  EXPECT_FALSE(
       tpm_auth_block
           .DecryptTpmBoundToPcr(vault_key, tpm_key, salt, &vkk_iv, &vkk_key)
           .ok());
@@ -1274,7 +1296,7 @@ class CryptohomeRecoveryAuthBlockTest : public testing::Test {
   }
 
   void PerformRecovery(
-      cryptorecovery::RecoveryCryptoTpmBackend* tpm_backend,
+      hwsec::RecoveryCryptoFrontend* recovery_crypto,
       const CryptohomeRecoveryAuthBlockState& cryptohome_recovery_state,
       cryptorecovery::CryptoRecoveryRpcResponse* response_proto,
       brillo::SecureBlob* ephemeral_pub_key) {
@@ -1290,16 +1312,25 @@ class CryptohomeRecoveryAuthBlockTest : public testing::Test {
 
     // Start recovery process.
     std::unique_ptr<cryptorecovery::RecoveryCryptoImpl> recovery =
-        cryptorecovery::RecoveryCryptoImpl::Create(tpm_backend);
+        cryptorecovery::RecoveryCryptoImpl::Create(recovery_crypto, &platform_);
     ASSERT_TRUE(recovery);
     brillo::SecureBlob rsa_priv_key;
-    cryptorecovery::CryptoRecoveryRpcRequest recovery_request;
+
     cryptorecovery::RequestMetadata request_metadata;
+    cryptorecovery::GenerateRecoveryRequestRequest
+        generate_recovery_request_input_param(
+            {.hsm_payload = hsm_payload,
+             .request_meta_data = request_metadata,
+             .epoch_response = epoch_response_,
+             .encrypted_rsa_priv_key = rsa_priv_key,
+             .encrypted_channel_priv_key =
+                 cryptohome_recovery_state.encrypted_channel_priv_key,
+             .channel_pub_key = cryptohome_recovery_state.channel_pub_key,
+             .obfuscated_username = kObfuscatedUsername});
+    cryptorecovery::CryptoRecoveryRpcRequest recovery_request;
     ASSERT_TRUE(recovery->GenerateRecoveryRequest(
-        hsm_payload, request_metadata, epoch_response_, rsa_priv_key,
-        cryptohome_recovery_state.encrypted_channel_priv_key,
-        cryptohome_recovery_state.channel_pub_key, kObfuscatedUsername,
-        &recovery_request, ephemeral_pub_key));
+        generate_recovery_request_input_param, &recovery_request,
+        ephemeral_pub_key));
 
     // Simulate mediation (it will be done by Recovery Mediator service).
     std::unique_ptr<FakeRecoveryMediatorCrypto> mediator =
@@ -1321,6 +1352,7 @@ class CryptohomeRecoveryAuthBlockTest : public testing::Test {
   brillo::SecureBlob mediator_pub_key_;
   brillo::SecureBlob epoch_pub_key_;
   cryptorecovery::CryptoRecoveryEpochResponse epoch_response_;
+  FakePlatform platform_;
 };
 
 TEST_F(CryptohomeRecoveryAuthBlockTest, SuccessTest) {
@@ -1330,10 +1362,10 @@ TEST_F(CryptohomeRecoveryAuthBlockTest, SuccessTest) {
   auth_input.cryptohome_recovery_auth_input = cryptohome_recovery_auth_input;
   auth_input.obfuscated_username = kObfuscatedUsername;
 
-  // Tpm::GetLECredentialBackend() returns `nullptr` -> revocation is not
-  // supported.
-  cryptorecovery::RecoveryCryptoFakeTpmBackendImpl
-      recovery_crypto_fake_tpm_backend;
+  // IsPinWeaverEnabled()) returns `false` -> revocation is not supported.
+  hwsec::Tpm2SimulatorFactoryForTest factory;
+  std::unique_ptr<hwsec::RecoveryCryptoFrontend> recovery_crypto_fake_backend =
+      factory.GetRecoveryCryptoFrontend();
 
   NiceMock<hwsec::MockCryptohomeFrontend> hwsec;
   SetupMockHwsec(hwsec);
@@ -1341,13 +1373,11 @@ TEST_F(CryptohomeRecoveryAuthBlockTest, SuccessTest) {
 
   KeyBlobs created_key_blobs;
   CryptohomeRecoveryAuthBlock auth_block(
-      &hwsec, &recovery_crypto_fake_tpm_backend, nullptr);
+      &hwsec, recovery_crypto_fake_backend.get(), nullptr, &platform_);
   AuthBlockState auth_state;
   EXPECT_TRUE(
       auth_block.Create(auth_input, &auth_state, &created_key_blobs).ok());
   ASSERT_TRUE(created_key_blobs.vkk_key.has_value());
-  ASSERT_TRUE(created_key_blobs.vkk_iv.has_value());
-  ASSERT_TRUE(created_key_blobs.chaps_iv.has_value());
   EXPECT_FALSE(auth_state.revocation_state.has_value());
 
   ASSERT_TRUE(std::holds_alternative<CryptohomeRecoveryAuthBlockState>(
@@ -1357,7 +1387,7 @@ TEST_F(CryptohomeRecoveryAuthBlockTest, SuccessTest) {
 
   brillo::SecureBlob ephemeral_pub_key;
   cryptorecovery::CryptoRecoveryRpcResponse response_proto;
-  PerformRecovery(&recovery_crypto_fake_tpm_backend, cryptohome_recovery_state,
+  PerformRecovery(recovery_crypto_fake_backend.get(), cryptohome_recovery_state,
                   &response_proto, &ephemeral_pub_key);
 
   CryptohomeRecoveryAuthInput derive_cryptohome_recovery_auth_input;
@@ -1377,8 +1407,6 @@ TEST_F(CryptohomeRecoveryAuthBlockTest, SuccessTest) {
   EXPECT_TRUE(
       auth_block.Derive(auth_input, auth_state, &derived_key_blobs).ok());
   ASSERT_TRUE(derived_key_blobs.vkk_key.has_value());
-  ASSERT_TRUE(derived_key_blobs.vkk_iv.has_value());
-  ASSERT_TRUE(derived_key_blobs.chaps_iv.has_value());
 
   // KeyBlobs generated by `Create` should be the same as KeyBlobs generated by
   // `Derive`.
@@ -1394,15 +1422,15 @@ TEST_F(CryptohomeRecoveryAuthBlockTest, SuccessTestWithRevocation) {
   auth_input.cryptohome_recovery_auth_input = cryptohome_recovery_auth_input;
   auth_input.obfuscated_username = kObfuscatedUsername;
 
-  // Tpm::GetLECredentialBackend()::IsSupported() returns `true` -> revocation
-  // is supported.
-  cryptorecovery::RecoveryCryptoFakeTpmBackendImpl
-      recovery_crypto_fake_tpm_backend;
+  // IsPinWeaverEnabled() returns `true` -> revocation is supported.
+  hwsec::Tpm2SimulatorFactoryForTest factory;
+  std::unique_ptr<hwsec::RecoveryCryptoFrontend> recovery_crypto_fake_backend =
+      factory.GetRecoveryCryptoFrontend();
   NiceMock<MockLECredentialManager> le_cred_manager;
   brillo::SecureBlob le_secret, he_secret;
   uint64_t le_label = 1;
   EXPECT_CALL(le_cred_manager, InsertCredential(_, _, _, _, _, _))
-      .WillOnce(DoAll(SaveArg<0>(&le_secret), SaveArg<1>(&he_secret),
+      .WillOnce(DoAll(SaveArg<1>(&le_secret), SaveArg<2>(&he_secret),
                       SetArgPointee<5>(le_label),
                       ReturnError<CryptohomeLECredError>()));
 
@@ -1412,13 +1440,11 @@ TEST_F(CryptohomeRecoveryAuthBlockTest, SuccessTestWithRevocation) {
 
   KeyBlobs created_key_blobs;
   CryptohomeRecoveryAuthBlock auth_block(
-      &hwsec, &recovery_crypto_fake_tpm_backend, &le_cred_manager);
+      &hwsec, recovery_crypto_fake_backend.get(), &le_cred_manager, &platform_);
   AuthBlockState auth_state;
   EXPECT_TRUE(
       auth_block.Create(auth_input, &auth_state, &created_key_blobs).ok());
   ASSERT_TRUE(created_key_blobs.vkk_key.has_value());
-  ASSERT_TRUE(created_key_blobs.vkk_iv.has_value());
-  ASSERT_TRUE(created_key_blobs.chaps_iv.has_value());
 
   // The revocation state should be created with the le_label returned by
   // InsertCredential().
@@ -1433,7 +1459,7 @@ TEST_F(CryptohomeRecoveryAuthBlockTest, SuccessTestWithRevocation) {
 
   brillo::SecureBlob ephemeral_pub_key;
   cryptorecovery::CryptoRecoveryRpcResponse response_proto;
-  PerformRecovery(&recovery_crypto_fake_tpm_backend, cryptohome_recovery_state,
+  PerformRecovery(recovery_crypto_fake_backend.get(), cryptohome_recovery_state,
                   &response_proto, &ephemeral_pub_key);
 
   CryptohomeRecoveryAuthInput derive_cryptohome_recovery_auth_input;
@@ -1457,8 +1483,6 @@ TEST_F(CryptohomeRecoveryAuthBlockTest, SuccessTestWithRevocation) {
   EXPECT_TRUE(
       auth_block.Derive(auth_input, auth_state, &derived_key_blobs).ok());
   ASSERT_TRUE(derived_key_blobs.vkk_key.has_value());
-  ASSERT_TRUE(derived_key_blobs.vkk_iv.has_value());
-  ASSERT_TRUE(derived_key_blobs.chaps_iv.has_value());
 
   // LE secret should be the same in InsertCredential and CheckCredential.
   EXPECT_EQ(le_secret, le_secret_1);
@@ -1478,16 +1502,17 @@ TEST_F(CryptohomeRecoveryAuthBlockTest, MissingObfuscatedUsername) {
 
   // Tpm::GetLECredentialBackend() returns `nullptr` -> revocation is not
   // supported.
-  cryptorecovery::RecoveryCryptoFakeTpmBackendImpl
-      recovery_crypto_fake_tpm_backend;
+  hwsec::Tpm2SimulatorFactoryForTest factory;
+  std::unique_ptr<hwsec::RecoveryCryptoFrontend> recovery_crypto_fake_backend =
+      factory.GetRecoveryCryptoFrontend();
 
   NiceMock<hwsec::MockCryptohomeFrontend> hwsec;
   SetupMockHwsec(hwsec);
 
   KeyBlobs created_key_blobs;
-  CryptohomeRecoveryAuthBlock auth_block(&hwsec,
-                                         &recovery_crypto_fake_tpm_backend,
-                                         /*LECredentialManager*=*/nullptr);
+  CryptohomeRecoveryAuthBlock auth_block(
+      &hwsec, recovery_crypto_fake_backend.get(),
+      /*LECredentialManager*=*/nullptr, &platform_);
   AuthBlockState auth_state;
   EXPECT_FALSE(
       auth_block.Create(auth_input, &auth_state, &created_key_blobs).ok());
@@ -1561,8 +1586,9 @@ TEST(TpmEccAuthBlockTest, CreateRetryTest) {
   // daemon.
   EXPECT_CALL(hwsec, GetAuthValue(_, _))
       .Times(Exactly(6))
-      .WillOnce(ReturnError<EllipticCurveError>(
-          EllipticCurveErrorCode::kScalarOutOfRange))
+      .WillOnce(
+          ReturnError<TPMError>("ECC scalar out of range",
+                                TPMRetryAction::kEllipticCurveScalarOutOfRange))
       .WillOnce(DoAll(SaveArg<1>(&scrypt_derived_key), ReturnValue(auth_value)))
       .WillRepeatedly(ReturnValue(auth_value));
 

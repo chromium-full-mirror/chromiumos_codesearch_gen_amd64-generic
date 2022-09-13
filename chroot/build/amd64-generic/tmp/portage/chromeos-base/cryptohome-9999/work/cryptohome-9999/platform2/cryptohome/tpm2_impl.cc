@@ -23,7 +23,6 @@
 #include <base/strings/stringprintf.h>
 #include <crypto/libcrypto-compat.h>
 #include <crypto/scoped_openssl_types.h>
-#include <libhwsec/error/elliptic_curve_error.h>
 #include <libhwsec/error/tpm_retry_handler.h>
 #include <libhwsec/error/tpm2_error.h>
 #include <libhwsec/status.h>
@@ -53,8 +52,6 @@ using brillo::Blob;
 using brillo::BlobFromString;
 using brillo::BlobToString;
 using brillo::SecureBlob;
-using hwsec::EllipticCurveError;
-using hwsec::EllipticCurveErrorCode;
 using hwsec::TPM2Error;
 using hwsec::TPMError;
 using hwsec::TPMErrorBase;
@@ -148,8 +145,9 @@ hwsec::Status DeriveTpmEccPointFromSeed(const SecureBlob& seed,
 
   if (!ec->IsScalarValid(*private_key)) {
     // Generate another pass_blob may resolve this issue.
-    return CreateError<EllipticCurveError>(
-        EllipticCurveErrorCode::kScalarOutOfRange);
+    return CreateError<TPMError>(
+        "ECC scalar out of range",
+        TPMRetryAction::kEllipticCurveScalarOutOfRange);
   }
 
   crypto::ScopedEC_POINT public_point =
@@ -182,7 +180,9 @@ std::map<uint32_t, std::string> ToStrPcrMap(
 
 Tpm2Impl::Tpm2Impl()
     : hwsec_factory_(std::make_unique<hwsec::FactoryImpl>()),
-      hwsec_(hwsec_factory_->GetCryptohomeFrontend()) {}
+      hwsec_(hwsec_factory_->GetCryptohomeFrontend()),
+      pinweaver_(hwsec_factory_->GetPinWeaverFrontend()),
+      recovery_crypto_(hwsec_factory_->GetRecoveryCryptoFrontend()) {}
 
 Tpm2Impl::Tpm2Impl(std::unique_ptr<hwsec::CryptohomeFrontend> hwsec,
                    trunks::TrunksFactory* factory,
@@ -1036,8 +1036,7 @@ bool Tpm2Impl::GetDictionaryAttackInfo(int* counter,
       counter, threshold, lockout, seconds_remaining);
 }
 
-bool Tpm2Impl::ResetDictionaryAttackMitigation(
-    const Blob& /* delegate_blob */, const Blob& /* delegate_secret */) {
+bool Tpm2Impl::ResetDictionaryAttackMitigation() {
   if (!InitializeTpmManagerUtility()) {
     LOG(ERROR) << __func__ << ": Failed to initialize |TpmManagerUtility|.";
     return false;
@@ -1343,20 +1342,8 @@ bool Tpm2Impl::GetRsuDeviceId(std::string* device_id) {
   return trunks->tpm_utility->GetRsuDeviceId(device_id) == TPM_RC_SUCCESS;
 }
 
-LECredentialBackend* Tpm2Impl::GetLECredentialBackend() {
-#if USE_PINWEAVER
-  return &le_credential_backend_;
-#else
-  return nullptr;
-#endif
-}
-
-SignatureSealingBackend* Tpm2Impl::GetSignatureSealingBackend() {
-  return &signature_sealing_backend_;
-}
-
-cryptorecovery::RecoveryCryptoTpmBackend* Tpm2Impl::GetRecoveryCryptoBackend() {
-  return &recovery_crypto_backend_;
+hwsec::RecoveryCryptoFrontend* Tpm2Impl::GetRecoveryCrypto() {
+  return recovery_crypto_.get();
 }
 
 bool Tpm2Impl::GetDelegate(brillo::Blob* /*blob*/,
@@ -1393,6 +1380,10 @@ std::map<uint32_t, brillo::Blob> Tpm2Impl::GetPcrMap(
 
 hwsec::CryptohomeFrontend* Tpm2Impl::GetHwsec() {
   return hwsec_.get();
+}
+
+hwsec::PinWeaverFrontend* Tpm2Impl::GetPinWeaver() {
+  return pinweaver_.get();
 }
 
 }  // namespace cryptohome

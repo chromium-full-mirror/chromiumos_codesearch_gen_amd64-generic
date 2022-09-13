@@ -99,7 +99,7 @@ class RealUserSession : public UserSession {
 
   // Sets credentials current session can be re-authenticated with.
   // Returns false in case anything went wrong in setting up new re-auth state.
-  bool SetCredentials(const Credentials& credentials) override;
+  void SetCredentials(const Credentials& credentials) override;
 
   // Sets credentials current session can be re-authenticated with.
   void SetCredentials(AuthSession* auth_session) override;
@@ -108,6 +108,11 @@ class RealUserSession : public UserSession {
   bool HasCredentialVerifier() const override {
     return credential_verifier_ != nullptr;
   }
+
+  // Removes the credential_verifier if key_label matches the current verifier
+  // label (stored in RealUserSession::key_data_).
+  void RemoveCredentialVerifierForKeyLabel(
+      const std::string& key_label) override;
 
   // Checks that the session belongs to the obfuscated_user.
   bool VerifyUser(const std::string& obfuscated_username) const override;
@@ -131,8 +136,6 @@ class RealUserSession : public UserSession {
                              const brillo::SecureBlob& fnek) override;
 
  private:
-  ~RealUserSession() override;
-
   // Computes a public derivative from |fek| and |fnek|, and store its hash for
   // u2fd to fetch.
   void PrepareWebAuthnSecretHash(const brillo::SecureBlob& fek,

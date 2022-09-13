@@ -13,6 +13,7 @@
 #include <base/logging.h>
 
 #include "diagnostics/cros_healthd/fetchers/audio_fetcher.h"
+#include "diagnostics/cros_healthd/fetchers/audio_hardware_fetcher.h"
 #include "diagnostics/cros_healthd/fetchers/bus_fetcher.h"
 #include "diagnostics/cros_healthd/utils/callback_barrier.h"
 
@@ -124,17 +125,8 @@ void FetchAggregator::Run(
         break;
       }
       case mojom::ProbeCategoryEnum::kSystem: {
-        system_fetcher_.FetchSystemInfoV2(
-            CreateFetchCallback(&barrier, &info->system_result_v2));
-        auto system_info = system_fetcher_.ConvertToSystemInfo(
-            info->system_result_v2->get_system_info_v2());
-        info->system_result =
-            mojom::SystemResult::NewSystemInfo(std::move(system_info));
-        break;
-      }
-      case mojom::ProbeCategoryEnum::kSystem2: {
-        system_fetcher_.FetchSystemInfoV2(
-            CreateFetchCallback(&barrier, &info->system_result_v2));
+        system_fetcher_.FetchSystemInfo(
+            CreateFetchCallback(&barrier, &info->system_result));
         break;
       }
       case mojom::ProbeCategoryEnum::kNetwork: {
@@ -179,6 +171,17 @@ void FetchAggregator::Run(
       case mojom::ProbeCategoryEnum::kInput: {
         input_fetcher_.Fetch(
             CreateFetchCallback(&barrier, &info->input_result));
+        break;
+      }
+      case mojom::ProbeCategoryEnum::kAudioHardware: {
+        FetchAudioHardwareInfo(
+            context_,
+            CreateFetchCallback(&barrier, &info->audio_hardware_result));
+        break;
+      }
+      case mojom::ProbeCategoryEnum::kSensor: {
+        FetchSensorInfo(context_,
+                        CreateFetchCallback(&barrier, &info->sensor_result));
         break;
       }
     }

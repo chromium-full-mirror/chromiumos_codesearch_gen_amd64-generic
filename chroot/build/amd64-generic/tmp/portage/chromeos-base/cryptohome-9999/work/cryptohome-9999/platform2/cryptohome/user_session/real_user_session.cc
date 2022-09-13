@@ -51,7 +51,7 @@ constexpr char kWebAuthnSecretHmacMessage[] = "AuthTimeWebAuthnSecret";
 constexpr char kHibernateSecretHmacMessage[] = "AuthTimeHibernateSecret";
 
 RealUserSession::RealUserSession() {}
-RealUserSession::~RealUserSession() {}
+
 RealUserSession::RealUserSession(
     const std::string& username,
     HomeDirs* homedirs,
@@ -259,16 +259,18 @@ std::unique_ptr<brillo::SecureBlob> RealUserSession::GetHibernateSecret() {
   return std::move(hibernate_secret_);
 }
 
-bool RealUserSession::SetCredentials(const Credentials& credentials) {
+void RealUserSession::SetCredentials(const Credentials& credentials) {
   if (obfuscated_username_ != credentials.GetObfuscatedUsername()) {
     NOTREACHED() << "SetCredentials username mismatch.";
-    return false;
+    return;
   }
 
   key_data_ = credentials.key_data();
 
-  credential_verifier_.reset(new ScryptVerifier());
-  return credential_verifier_->Set(credentials.passkey());
+  credential_verifier_.reset(new ScryptVerifier(key_data_.label()));
+  if (!credential_verifier_->Set(credentials.passkey())) {
+    LOG(WARNING) << "CredentialVerifier could not be set";
+  }
 }
 
 void RealUserSession::SetCredentials(AuthSession* auth_session) {
@@ -297,11 +299,11 @@ bool RealUserSession::VerifyCredentials(const Credentials& credentials) const {
   if (!VerifyUser(credentials.GetObfuscatedUsername())) {
     return false;
   }
-  // If the incoming credentials have no label, then just
-  // test the secret.  If it is labeled, then the label must
-  // match.
+  // If the incoming credentials have no label, then just test the secret. If it
+  // is labeled, then the label must match.
   if (!credentials.key_data().label().empty() &&
-      credentials.key_data().label() != key_data_.label()) {
+      credentials.key_data().label() !=
+          credential_verifier_->auth_factor_label()) {
     return false;
   }
 
@@ -310,6 +312,20 @@ bool RealUserSession::VerifyCredentials(const Credentials& credentials) const {
   ReportTimerStop(kSessionUnlockTimer);
 
   return status;
+}
+
+void RealUserSession::RemoveCredentialVerifierForKeyLabel(
+    const std::string& key_label) {
+  if (!credential_verifier_) {
+    return;
+  }
+
+  // If the credential to remove has the same label as the current credential
+  // verifier, then we reset the credential verifier and remove KeyData.
+  if (key_label == credential_verifier_->auth_factor_label()) {
+    credential_verifier_.reset();
+    key_data_ = KeyData();
+  }
 }
 
 }  // namespace cryptohome

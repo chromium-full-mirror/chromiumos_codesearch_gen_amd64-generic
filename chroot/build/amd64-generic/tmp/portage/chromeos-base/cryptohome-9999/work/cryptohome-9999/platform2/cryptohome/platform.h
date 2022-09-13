@@ -370,15 +370,6 @@ class Platform {
   virtual int64_t GetQuotaCurrentSpaceForProjectId(const base::FilePath& device,
                                                    int project_id) const;
 
-  // Sets the project ID to the file/directory pointed by path.
-  // Returns true if ioctl syscall succeeds.
-  //
-  // Parameters
-  //   project_id - The project ID
-  //   path - Path of the file/directory to set the project ID
-  virtual bool SetQuotaProjectId(int project_id,
-                                 const base::FilePath& path) const;
-
   // Sets the project ID to the FD.
   // Returns true if ioctl syscall succeeds.
   //
@@ -890,6 +881,12 @@ class Platform {
   // Parameters
   //   device - Path to the loop device to be detached.
   virtual bool DetachLoop(const base::FilePath& device_path);
+
+  // Discard device; call blkdiscard on the entire device.
+  //
+  // Parameters
+  //   device - Device to call blkdiscard on.
+  virtual bool DiscardDevice(const base::FilePath& device);
 
   // DEPRECATED: do not use. Use LoopDeviceManager instead.
   // Returns list of attached loop devices.

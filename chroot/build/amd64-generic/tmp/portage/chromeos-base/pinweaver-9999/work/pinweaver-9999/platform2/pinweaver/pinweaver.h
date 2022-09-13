@@ -91,7 +91,7 @@ struct PW_PACKED pw_log_storage_t {
 /* Do not remove fields within the same PW_LEAF_MAJOR_VERSION. */
 /* Encrypted part of the leaf data.
  */
-struct PW_PACKED PW_ALIGN_TO_BLK leaf_sensitive_data_t {
+struct PW_ALIGN_TO_BLK leaf_sensitive_data_t {
 	uint8_t low_entropy_secret[PW_SECRET_SIZE];
 	uint8_t high_entropy_secret[PW_SECRET_SIZE];
 	uint8_t reset_secret[PW_SECRET_SIZE];
@@ -214,7 +214,8 @@ int log_insert_leaf(struct label_t label, const uint8_t root[PW_HASH_SIZE],
 		    const uint8_t hmac[PW_HASH_SIZE]);
 int log_remove_leaf(struct label_t label, const uint8_t root[PW_HASH_SIZE]);
 int log_auth(struct label_t label, const uint8_t root[PW_HASH_SIZE], int code,
-	     struct pw_timestamp_t timestamp);
+	     struct pw_timestamp_t last_access_ts,
+	     struct pw_timestamp_t expiration_ts);
 
 #ifdef __cplusplus
 }
