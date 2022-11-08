@@ -99,13 +99,17 @@ struct StatusLinkerLogDetail {
 template <typename T>
 class StatusLinker {
  public:
-  StatusLinker(const char* file, int line, StatusChain<T>&& status)
+  StatusLinker(const char* file,
+               int line,
+               StatusChain<T>&& status [[clang::param_typestate(unconsumed)]])
       : internal_(std::move(status)),
         log_detail_({
             .file = file,
             .line = line,
         }) {}
-  StatusLinker(StatusChain<T>&& status, StatusLinkerLogDetail&& detail)
+
+  StatusLinker(StatusChain<T>&& status [[clang::param_typestate(unconsumed)]],
+               StatusLinkerLogDetail&& detail)
       : internal_(std::move(status)), log_detail_(std::move(detail)) {}
 
   StatusLinker(StatusLinker&& linker)
@@ -182,7 +186,8 @@ class StatusLinker {
 
  private:
   void LogIfNeeded() {
-    if (log_detail_.severity.has_value()) {
+    if (log_detail_.severity.has_value() &&
+        logging::ShouldCreateLogMessage(log_detail_.severity.value())) {
       logging::LogMessage logger(log_detail_.file, log_detail_.line,
                                  log_detail_.severity.value());
       std::string str = log_detail_.stream.str();
@@ -204,9 +209,9 @@ StatusLinker(StatusChain<T>&&) -> StatusLinker<T>;
 }  // namespace hwsec_foundation
 
 #define RETURN_IF_ERROR(expr)                                         \
-  if (auto status = (expr); !status.ok())                             \
+  if (auto _status_ = (expr); !_status_.ok())                         \
   return ::hwsec_foundation::status::StatusLinker(__FILE__, __LINE__, \
-                                                  std::move(status))
+                                                  std::move(_status_))
 
 // Internal helper for concatenating macro values.
 #define STATUS_MACROS_CONCAT_NAME_INNER(x, y) x##y

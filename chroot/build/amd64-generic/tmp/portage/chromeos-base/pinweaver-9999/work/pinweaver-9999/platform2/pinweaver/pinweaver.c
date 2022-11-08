@@ -1,4 +1,4 @@
-/* Copyright 2018 The Chromium OS Authors. All rights reserved.
+/* Copyright 2018 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
@@ -94,6 +94,15 @@ BUILD_ASSERT(sizeof(struct leaf_sensitive_data_t) == 3 * PW_SECRET_SIZE);
  */
 uint32_t pw_restart_count;
 
+#if BIOMETRICS_DEV
+/* If non-zero, Pk establishment is blocked. The client should send a
+ * block_generate_ba_pk command after the client platform passed the stage
+ * that Pk establishment is allowed. This reduces the risk of active attackers
+ * trying to establish Pk with the server.
+ */
+int generate_ba_pk_blocked;
+#endif
+
 /******************************************************************************/
 /* Struct helper functions.
  */
@@ -161,6 +170,14 @@ static int create_merkle_tree(struct bits_per_level_t bits_per_level,
 	return pinweaver_eal_derive_keys(merkle_tree);
 }
 
+static size_t hmac_iv_size(int minor_version)
+{
+	if (minor_version == 2)
+		return PW_HMAC_IV_SIZE_V2;
+	else
+		return PW_HMAC_IV_SIZE_V1;
+}
+
 /* Computes the HMAC for an encrypted leaf using the key in the merkle_tree. */
 static int compute_hmac(const struct merkle_tree_t *merkle_tree,
 			const struct imported_leaf_data_t *imported_leaf_data,
@@ -181,7 +198,7 @@ static int compute_hmac(const struct merkle_tree_t *merkle_tree,
 		return ret;
 	}
 	ret = pinweaver_eal_hmac_sha256_update(&hmac, imported_leaf_data->iv,
-					       sizeof(PW_WRAP_BLOCK_SIZE));
+					hmac_iv_size(imported_leaf_data->head->leaf_version.minor));
 	if (ret) {
 		pinweaver_eal_hmac_sha256_final(&hmac, result);
 		return ret;
@@ -1601,6 +1618,10 @@ static int pw_handle_generate_pk(struct merkle_tree_t *merkle_tree,
 		return PW_ERR_LENGTH_INVALID;
 	auth_channel = request->auth_channel;
 
+	if (generate_ba_pk_blocked) {
+		return PW_ERR_BIO_AUTH_ACCESS_DENIED;
+	}
+
 	/* Currently we only support v0 public key format. */
 	if (request->client_pbk.version != 0) {
 		return PW_ERR_BIO_AUTH_PUBLIC_KEY_VERSION_MISMATCH;
@@ -1814,6 +1835,12 @@ static int pw_handle_start_bio_auth(struct merkle_tree_t *merkle_tree,
 
 	return EC_SUCCESS;
 }
+
+static int pw_handle_block_generate_ba_pk()
+{
+	generate_ba_pk_blocked = 1;
+	return EC_SUCCESS;
+}
 #endif
 
 struct merkle_tree_t pw_merkle_tree;
@@ -1825,6 +1852,9 @@ struct merkle_tree_t pw_merkle_tree;
 void pinweaver_init(void)
 {
 	load_merkle_tree(&pw_merkle_tree);
+#if BIOMETRICS_DEV
+	generate_ba_pk_blocked = 0;
+#endif
 }
 
 int get_path_auxiliary_hash_count(const struct merkle_tree_t *merkle_tree)
@@ -2153,6 +2183,9 @@ int pw_handle_request(struct merkle_tree_t *merkle_tree,
 					request->header.data_length,
 					&response->data.start_bio_auth,
 					&resp_length);
+		break;
+	case PW_BLOCK_GENERATE_BA_PK:
+		ret = pw_handle_block_generate_ba_pk();
 		break;
 #endif
 	default:
