@@ -87,6 +87,12 @@ static NOINLINE const char* DiagnosticRoutineEnumToStringHelper(DiagnosticRoutin
       return "kArcDnsResolution";
     case DiagnosticRoutineEnum::kUnknown:
       return "kUnknown";
+    case DiagnosticRoutineEnum::kSensitiveSensor:
+      return "kSensitiveSensor";
+    case DiagnosticRoutineEnum::kFingerprint:
+      return "kFingerprint";
+    case DiagnosticRoutineEnum::kFingerprintAlive:
+      return "kFingerprintAlive";
     default:
       return nullptr;
   }
