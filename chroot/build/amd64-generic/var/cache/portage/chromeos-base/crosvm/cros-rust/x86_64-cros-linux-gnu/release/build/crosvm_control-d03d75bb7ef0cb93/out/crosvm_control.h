@@ -92,6 +92,28 @@ bool crosvm_client_make_rt_vm(const char *socket_path);
 bool crosvm_client_balloon_vms(const char *socket_path, uint64_t num_bytes);
 
 /**
+ * Enable vmm swap for crosvm instance whose control socket is listening on `socket_path`.
+ *
+ * The function returns true on success or false if an error occured.
+ */
+bool crosvm_client_swap_enable_vm(const char *socket_path);
+
+/**
+ * Swap out staging memory for crosvm instance whose control socket is listening
+ * on `socket_path`.
+ *
+ * The function returns true on success or false if an error occured.
+ */
+bool crosvm_client_swap_swapout_vm(const char *socket_path);
+
+/**
+ * Disable vmm swap for crosvm instance whose control socket is listening on `socket_path`.
+ *
+ * The function returns true on success or false if an error occured.
+ */
+bool crosvm_client_swap_disable_vm(const char *socket_path);
+
+/**
  * Simply returns the maximum possible number of USB devices
  */
 uintptr_t crosvm_client_max_usb_devices(void);
