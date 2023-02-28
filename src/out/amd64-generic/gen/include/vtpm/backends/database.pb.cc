@@ -13,21 +13,25 @@
 #include <google/protobuf/port_def.inc>
 
 PROTOBUF_PRAGMA_INIT_SEG
+
+namespace _pb = ::PROTOBUF_NAMESPACE_ID;
+namespace _pbi = _pb::internal;
+
 namespace vtpm {
-constexpr BlobData::BlobData(
-  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : blob_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
-  , version_(0)
-{}
+PROTOBUF_CONSTEXPR BlobData::BlobData(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.blob_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.version_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
 struct BlobDataDefaultTypeInternal {
-  constexpr BlobDataDefaultTypeInternal()
-    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  PROTOBUF_CONSTEXPR BlobDataDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
   ~BlobDataDefaultTypeInternal() {}
   union {
     BlobData _instance;
   };
 };
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT BlobDataDefaultTypeInternal _BlobData_default_instance_;
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 BlobDataDefaultTypeInternal _BlobData_default_instance_;
 }  // namespace vtpm
 namespace vtpm {
 bool Version_IsValid(int value) {
@@ -87,55 +91,61 @@ class BlobData::_Internal {
 BlobData::BlobData(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::MessageLite(arena, is_message_owned) {
-  SharedCtor();
-  if (!is_message_owned) {
-    RegisterArenaDtor(arena);
-  }
+  SharedCtor(arena, is_message_owned);
   // @@protoc_insertion_point(arena_constructor:vtpm.BlobData)
 }
 BlobData::BlobData(const BlobData& from)
   : ::PROTOBUF_NAMESPACE_ID::MessageLite() {
+  BlobData* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.blob_){}
+    , decltype(_impl_.version_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
   _internal_metadata_.MergeFrom<std::string>(from._internal_metadata_);
-  blob_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.blob_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    blob_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+    _impl_.blob_.Set("", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_blob().empty()) {
-    blob_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_blob(), 
-      GetArenaForAllocation());
+    _this->_impl_.blob_.Set(from._internal_blob(), 
+      _this->GetArenaForAllocation());
   }
-  version_ = from.version_;
+  _this->_impl_.version_ = from._impl_.version_;
   // @@protoc_insertion_point(copy_constructor:vtpm.BlobData)
 }
 
-inline void BlobData::SharedCtor() {
-blob_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  blob_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-version_ = 0;
+inline void BlobData::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.blob_){}
+    , decltype(_impl_.version_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.blob_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.blob_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 BlobData::~BlobData() {
   // @@protoc_insertion_point(destructor:vtpm.BlobData)
-  if (GetArenaForAllocation() != nullptr) return;
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<std::string>()) {
+  (void)arena;
+    return;
+  }
   SharedDtor();
-  _internal_metadata_.Delete<std::string>();
 }
 
 inline void BlobData::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  blob_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.blob_.Destroy();
 }
 
-void BlobData::ArenaDtor(void* object) {
-  BlobData* _this = reinterpret_cast< BlobData* >(object);
-  (void)_this;
-}
-void BlobData::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
-}
 void BlobData::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
+  _impl_._cached_size_.Set(size);
 }
 
 void BlobData::Clear() {
@@ -144,16 +154,16 @@ void BlobData::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  blob_.ClearToEmpty();
-  version_ = 0;
+  _impl_.blob_.ClearToEmpty();
+  _impl_.version_ = 0;
   _internal_metadata_.Clear<std::string>();
 }
 
-const char* BlobData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* BlobData::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
     uint32_t tag;
-    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // .vtpm.Version version = 1;
       case 1:
@@ -168,7 +178,7 @@ const char* BlobData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::i
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_blob();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -205,7 +215,7 @@ uint8_t* BlobData::_InternalSerialize(
   // .vtpm.Version version = 1;
   if (this->_internal_version() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+    target = ::_pbi::WireFormatLite::WriteEnumToArray(
       1, this->_internal_version(), target);
   }
 
@@ -241,36 +251,37 @@ size_t BlobData::ByteSizeLong() const {
   // .vtpm.Version version = 1;
   if (this->_internal_version() != 0) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_version());
+      ::_pbi::WireFormatLite::EnumSize(this->_internal_version());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     total_size += _internal_metadata_.unknown_fields<std::string>(::PROTOBUF_NAMESPACE_ID::internal::GetEmptyString).size();
   }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  int cached_size = ::_pbi::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
 void BlobData::CheckTypeAndMergeFrom(
     const ::PROTOBUF_NAMESPACE_ID::MessageLite& from) {
-  MergeFrom(*::PROTOBUF_NAMESPACE_ID::internal::DownCast<const BlobData*>(
+  MergeFrom(*::_pbi::DownCast<const BlobData*>(
       &from));
 }
 
 void BlobData::MergeFrom(const BlobData& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:vtpm.BlobData)
-  GOOGLE_DCHECK_NE(&from, this);
+  BlobData* const _this = this;
+  // @@protoc_insertion_point(class_specific_merge_from_start:vtpm.BlobData)
+  GOOGLE_DCHECK_NE(&from, _this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_blob().empty()) {
-    _internal_set_blob(from._internal_blob());
+    _this->_internal_set_blob(from._internal_blob());
   }
   if (from._internal_version() != 0) {
-    _internal_set_version(from._internal_version());
+    _this->_internal_set_version(from._internal_version());
   }
-  _internal_metadata_.MergeFrom<std::string>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<std::string>(from._internal_metadata_);
 }
 
 void BlobData::CopyFrom(const BlobData& from) {
@@ -290,11 +301,10 @@ void BlobData::InternalSwap(BlobData* other) {
   auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      &blob_, lhs_arena,
-      &other->blob_, rhs_arena
+      &_impl_.blob_, lhs_arena,
+      &other->_impl_.blob_, rhs_arena
   );
-  swap(version_, other->version_);
+  swap(_impl_.version_, other->_impl_.version_);
 }
 
 std::string BlobData::GetTypeName() const {
@@ -305,7 +315,8 @@ std::string BlobData::GetTypeName() const {
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace vtpm
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::vtpm::BlobData* Arena::CreateMaybeMessage< ::vtpm::BlobData >(Arena* arena) {
+template<> PROTOBUF_NOINLINE ::vtpm::BlobData*
+Arena::CreateMaybeMessage< ::vtpm::BlobData >(Arena* arena) {
   return Arena::CreateMessageInternal< ::vtpm::BlobData >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
