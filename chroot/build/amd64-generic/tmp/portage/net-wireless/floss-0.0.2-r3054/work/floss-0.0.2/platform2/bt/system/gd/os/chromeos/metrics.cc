@@ -17,6 +17,10 @@
  ******************************************************************************/
 
 #include "os/metrics.h"
+
+#include <metrics/structured_events.h>
+
+#include "gd/metrics/utils.h"
 #include "os/log.h"
 
 namespace bluetooth {
@@ -54,9 +58,59 @@ void LogMetricA2dpAudioOverrunEvent(
     uint64_t encoding_interval_millis,
     int num_dropped_buffers,
     int num_dropped_encoded_frames,
-    int num_dropped_encoded_bytes) {}
+    int num_dropped_encoded_bytes) {
+  std::string boot_id;
+  std::string addr_string;
 
-void LogMetricReadRssiResult(const Address& address, uint16_t handle, uint32_t cmd_status, int8_t rssi) {}
+  if (!metrics::GetBootId(&boot_id)) return;
+
+  addr_string = address.ToString();
+
+  LOG_DEBUG(
+      "A2dpAudioOverrun: %s, %s, %llu, %d, %d, %d",
+      boot_id.c_str(),
+      addr_string.c_str(),
+      (long long unsigned)encoding_interval_millis,
+      num_dropped_buffers,
+      num_dropped_encoded_bytes,
+      num_dropped_encoded_bytes);
+
+  ::metrics::structured::events::bluetooth::BluetoothA2dpAudioOverrun()
+      .SetBootId(boot_id)
+      .SetDeviceId(addr_string)
+      .SetEncodingInterval(encoding_interval_millis)
+      .SetDroppedBuffers(num_dropped_buffers)
+      .SetDroppedFrames(num_dropped_encoded_frames)
+      .SetDroppedBytes(num_dropped_encoded_bytes)
+      .Record();
+}
+
+void LogMetricHfpPacketLossStats(
+    const Address& address, int num_decoded_frames, double packet_loss_ratio) {
+  std::string boot_id;
+  std::string addr_string;
+
+  if (!metrics::GetBootId(&boot_id)) return;
+
+  addr_string = address.ToString();
+
+  LOG_DEBUG(
+      "HfpPacketLoss: %s, %s, %d, %f",
+      boot_id.c_str(),
+      addr_string.c_str(),
+      num_decoded_frames,
+      packet_loss_ratio);
+
+  ::metrics::structured::events::bluetooth::BluetoothHfpPacketLoss()
+      .SetBootId(boot_id)
+      .SetDeviceId(addr_string)
+      .SetDecodedFrames(num_decoded_frames)
+      .SetPacketLossRatio(packet_loss_ratio)
+      .Record();
+}
+
+void LogMetricReadRssiResult(
+    const Address& address, uint16_t handle, uint32_t cmd_status, int8_t rssi) {}
 
 void LogMetricReadFailedContactCounterResult(
     const Address& address, uint16_t handle, uint32_t cmd_status, int32_t failed_contact_counter) {}
@@ -65,7 +119,11 @@ void LogMetricReadTxPowerLevelResult(
     const Address& address, uint16_t handle, uint32_t cmd_status, int32_t transmit_power_level) {}
 
 void LogMetricRemoteVersionInfo(
-    uint16_t handle, uint8_t status, uint8_t version, uint16_t manufacturer_name, uint16_t subversion) {}
+    uint16_t handle,
+    uint8_t status,
+    uint8_t version,
+    uint16_t manufacturer_name,
+    uint16_t subversion) {}
 
 void LogMetricLinkLayerConnectionEvent(
     const Address* address,
@@ -96,9 +154,13 @@ void LogMetricSdpAttribute(
     const char* attribute_value) {}
 
 void LogMetricSmpPairingEvent(
-    const Address& address, uint16_t smp_cmd, android::bluetooth::DirectionEnum direction, uint16_t smp_fail_reason) {}
+    const Address& address,
+    uint16_t smp_cmd,
+    android::bluetooth::DirectionEnum direction,
+    uint16_t smp_fail_reason) {}
 
-void LogMetricA2dpPlaybackEvent(const Address& address, int playback_state, int audio_coding_mode) {}
+void LogMetricA2dpPlaybackEvent(const Address& address, int playback_state, int audio_coding_mode) {
+}
 
 void LogMetricBluetoothHalCrashReason(
     const Address& address, uint32_t error_code, uint32_t vendor_error_code) {}
@@ -110,7 +172,7 @@ void LogMetricBluetoothLocalVersions(
     uint8_t lmp_version,
     uint32_t lmp_subversion,
     uint8_t hci_version,
-    uint32_t hci_reversion) {}
+    uint32_t hci_revision) {}
 
 void LogMetricBluetoothDisconnectionReasonReported(
     uint32_t reason, const Address& address, uint32_t connection_handle) {}
@@ -119,5 +181,6 @@ void LogMetricBluetoothRemoteSupportedFeatures(
     const Address& address, uint32_t page, uint64_t features, uint32_t connection_handle) {}
 
 void LogMetricBluetoothCodePathCounterMetrics(int32_t key, int64_t count) {}
+
 }  // namespace os
 }  // namespace bluetooth

@@ -56,6 +56,9 @@ void LogMetricA2dpAudioOverrunEvent(
     int num_dropped_encoded_frames,
     int num_dropped_encoded_bytes) {}
 
+void LogMetricHfpPacketLossStats(
+    const Address& address, int num_decoded_frames, double packet_loss_ratio) {}
+
 void LogMetricReadRssiResult(const Address& address, uint16_t handle, uint32_t cmd_status, int8_t rssi) {}
 
 void LogMetricReadFailedContactCounterResult(
@@ -110,7 +113,7 @@ void LogMetricBluetoothLocalVersions(
     uint8_t lmp_version,
     uint32_t lmp_subversion,
     uint8_t hci_version,
-    uint32_t hci_revision) {}
+    uint32_t hci_reversion) {}
 
 void LogMetricBluetoothDisconnectionReasonReported(
     uint32_t reason, const Address& address, uint32_t connection_handle) {}
@@ -119,6 +122,5 @@ void LogMetricBluetoothRemoteSupportedFeatures(
     const Address& address, uint32_t page, uint64_t features, uint32_t connection_handle) {}
 
 void LogMetricBluetoothCodePathCounterMetrics(int32_t key, int64_t count) {}
-
 }  // namespace os
 }  // namespace bluetooth
