@@ -51,6 +51,20 @@ typedef struct BalloonStatsFfi {
   int64_t unevictable_memory;
 } BalloonStatsFfi;
 
+/**
+ * Publically exposed version of RegisteredEvent enum, implemented as an
+ * integral newtype for FFI safety.
+ */
+typedef struct RegisteredEventFfi {
+  uint32_t _0;
+} RegisteredEventFfi;
+
+#define REGISTERED_EVENT_VIRTIO_BALLOON_WSS_REPORT (RegisteredEventFfi){ ._0 = 0 }
+
+#define REGISTERED_EVENT_VIRTIO_BALLOON_RESIZE (RegisteredEventFfi){ ._0 = 1 }
+
+#define REGISTERED_EVENT_VIRTIO_BALLOON_OOM_DEFLATION (RegisteredEventFfi){ ._0 = 2 }
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -201,6 +215,25 @@ bool crosvm_client_resize_disk(const char *socket_path, uint64_t disk_index, uin
 bool crosvm_client_balloon_stats(const char *socket_path,
                                  struct BalloonStatsFfi *stats,
                                  uint64_t *actual);
+
+/**
+ * Registers the connected process as a listener for `event`.
+ */
+bool crosvm_client_register_events_listener(const char *socket_path,
+                                            const char *listening_socket_path,
+                                            struct RegisteredEventFfi event);
+
+/**
+ * Unegisters the connected process as a listener for `event`.
+ */
+bool crosvm_client_unregister_events_listener(const char *socket_path,
+                                              const char *listening_socket_path,
+                                              struct RegisteredEventFfi event);
+
+/**
+ * Unegisters the connected process as a listener for all events.
+ */
+bool crosvm_client_unregister_listener(const char *socket_path, const char *listening_socket_path);
 
 #ifdef __cplusplus
 } // extern "C"
