@@ -52,6 +52,18 @@ typedef struct BalloonStatsFfi {
 } BalloonStatsFfi;
 
 /**
+ * Externally exposed variant of BalloonWss/WSSBucket, used for FFI.
+ */
+typedef struct WSSBucketFfi {
+  uint64_t age;
+  uint64_t bytes[2];
+} WSSBucketFfi;
+
+typedef struct BalloonWSSFfi {
+  struct WSSBucketFfi wss[4];
+} BalloonWSSFfi;
+
+/**
  * Publically exposed version of RegisteredEvent enum, implemented as an
  * integral newtype for FFI safety.
  */
@@ -215,6 +227,12 @@ bool crosvm_client_resize_disk(const char *socket_path, uint64_t disk_index, uin
 bool crosvm_client_balloon_stats(const char *socket_path,
                                  struct BalloonStatsFfi *stats,
                                  uint64_t *actual);
+
+/**
+ * Returns balloon working set size of the crosvm instance whose control socket is listening on socket_path.
+ */
+bool crosvm_client_balloon_wss(const char *socket_path,
+                               struct BalloonWSSFfi *wss);
 
 /**
  * Registers the connected process as a listener for `event`.
