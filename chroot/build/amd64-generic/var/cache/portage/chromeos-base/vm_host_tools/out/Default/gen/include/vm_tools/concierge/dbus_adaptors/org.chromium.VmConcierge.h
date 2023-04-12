@@ -27,6 +27,9 @@ class VmConciergeInterface {
       const vm_tools::concierge::StopVmRequest& in_request) = 0;
   // Stops all running VMs.
   virtual void StopAllVms() = 0;
+  // Suspends a VM.
+  virtual vm_tools::concierge::SuspendVmResponse SuspendVm(
+      const vm_tools::concierge::SuspendVmRequest& in_request) = 0;
 };
 
 // Interface adaptor for org::chromium::VmConcierge.
@@ -48,6 +51,10 @@ class VmConciergeAdaptor {
         "StopAllVms",
         base::Unretained(interface_),
         &VmConciergeInterface::StopAllVms);
+    itf->AddSimpleMethodHandler(
+        "SuspendVm",
+        base::Unretained(interface_),
+        &VmConciergeInterface::SuspendVm);
   }
 
   static dbus::ObjectPath GetObjectPath() {
@@ -62,6 +69,10 @@ class VmConciergeAdaptor {
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"StopAllVms\">\n"
+        "    </method>\n"
+        "    <method name=\"SuspendVm\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "  </interface>\n";
   }
