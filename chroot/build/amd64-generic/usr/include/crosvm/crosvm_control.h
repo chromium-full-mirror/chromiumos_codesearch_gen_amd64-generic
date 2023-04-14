@@ -85,6 +85,12 @@ extern "C" {
  * Stops the crosvm instance whose control socket is listening on `socket_path`.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_stop_vm(const char *socket_path);
 
@@ -92,6 +98,12 @@ bool crosvm_client_stop_vm(const char *socket_path);
  * Suspends the crosvm instance whose control socket is listening on `socket_path`.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_suspend_vm(const char *socket_path);
 
@@ -99,6 +111,12 @@ bool crosvm_client_suspend_vm(const char *socket_path);
  * Resumes the crosvm instance whose control socket is listening on `socket_path`.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_resume_vm(const char *socket_path);
 
@@ -106,6 +124,12 @@ bool crosvm_client_resume_vm(const char *socket_path);
  * Creates an RT vCPU for the crosvm instance whose control socket is listening on `socket_path`.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_make_rt_vm(const char *socket_path);
 
@@ -114,6 +138,12 @@ bool crosvm_client_make_rt_vm(const char *socket_path);
  * listening on `socket_path`.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_balloon_vms(const char *socket_path, uint64_t num_bytes);
 
@@ -121,6 +151,12 @@ bool crosvm_client_balloon_vms(const char *socket_path, uint64_t num_bytes);
  * Enable vmm swap for crosvm instance whose control socket is listening on `socket_path`.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_swap_enable_vm(const char *socket_path);
 
@@ -129,6 +165,12 @@ bool crosvm_client_swap_enable_vm(const char *socket_path);
  * on `socket_path`.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_swap_swapout_vm(const char *socket_path);
 
@@ -136,6 +178,12 @@ bool crosvm_client_swap_swapout_vm(const char *socket_path);
  * Disable vmm swap for crosvm instance whose control socket is listening on `socket_path`.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_swap_disable_vm(const char *socket_path);
 
@@ -157,6 +205,12 @@ uintptr_t crosvm_client_max_usb_devices(void);
  *
  * Use the value returned by [`crosvm_client_max_usb_devices()`] to determine the size of the input
  * array to this function.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 ssize_t crosvm_client_usb_list(const char *socket_path,
                                struct UsbDeviceEntry *entries,
@@ -177,6 +231,12 @@ ssize_t crosvm_client_usb_list(const char *socket_path,
  * * `out_port` - (optional) internal port will be written here if provided.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_usb_attach(const char *socket_path,
                               uint8_t _bus,
@@ -191,6 +251,12 @@ bool crosvm_client_usb_attach(const char *socket_path,
  * `port` determines device to be detached.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_usb_detach(const char *socket_path, uint8_t port);
 
@@ -199,6 +265,12 @@ bool crosvm_client_usb_detach(const char *socket_path, uint8_t port);
  * `socket_path`.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_modify_battery(const char *socket_path,
                                   const char *battery_type,
@@ -209,6 +281,12 @@ bool crosvm_client_modify_battery(const char *socket_path,
  * Resizes the disk of the crosvm instance whose control socket is listening on `socket_path`.
  *
  * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_resize_disk(const char *socket_path, uint64_t disk_index, uint64_t new_size);
 
@@ -223,6 +301,12 @@ bool crosvm_client_resize_disk(const char *socket_path, uint64_t disk_index, uin
  * # Note
  *
  * Entries in `BalloonStatsFfi` that are not available will be set to `-1`.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_balloon_stats(const char *socket_path,
                                  struct BalloonStatsFfi *stats,
@@ -230,12 +314,28 @@ bool crosvm_client_balloon_stats(const char *socket_path,
 
 /**
  * Returns balloon working set size of the crosvm instance whose control socket is listening on socket_path.
+ *
+ * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_balloon_wss(const char *socket_path,
                                struct BalloonWSSFfi *wss);
 
 /**
  * Registers the connected process as a listener for `event`.
+ *
+ * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_register_events_listener(const char *socket_path,
                                             const char *listening_socket_path,
@@ -243,6 +343,14 @@ bool crosvm_client_register_events_listener(const char *socket_path,
 
 /**
  * Unegisters the connected process as a listener for `event`.
+ *
+ * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_unregister_events_listener(const char *socket_path,
                                               const char *listening_socket_path,
@@ -250,8 +358,29 @@ bool crosvm_client_unregister_events_listener(const char *socket_path,
 
 /**
  * Unegisters the connected process as a listener for all events.
+ *
+ * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
  */
 bool crosvm_client_unregister_listener(const char *socket_path, const char *listening_socket_path);
+
+/**
+ * Set Working Set Size config in guest.
+ *
+ * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
+ */
+bool crosvm_client_balloon_wss_config(const char *socket_path, const uint64_t (*config)[5]);
 
 #ifdef __cplusplus
 } // extern "C"
