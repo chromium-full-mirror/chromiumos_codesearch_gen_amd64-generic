@@ -324,7 +324,8 @@ bool crosvm_client_balloon_stats(const char *socket_path,
  * null pointers are passed.
  */
 bool crosvm_client_balloon_wss(const char *socket_path,
-                               struct BalloonWSSFfi *wss);
+                               struct BalloonWSSFfi *wss,
+                               uint64_t *actual);
 
 /**
  * Registers the connected process as a listener for `event`.
