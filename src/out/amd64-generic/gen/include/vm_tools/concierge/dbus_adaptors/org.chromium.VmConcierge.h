@@ -22,6 +22,54 @@ class VmConciergeInterface {
  public:
   virtual ~VmConciergeInterface() = default;
 
+  // Adjusts parameters of a given VM.
+  virtual vm_tools::concierge::AdjustVmResponse AdjustVm(
+      const vm_tools::concierge::AdjustVmRequest& in_request) = 0;
+  // Completes the boot of an ARCVM VM.
+  virtual vm_tools::concierge::ArcVmCompleteBootResponse ArcVmCompleteBoot(
+      const vm_tools::concierge::ArcVmCompleteBootRequest& in_request) = 0;
+  // Cancels a disk image operation.
+  virtual vm_tools::concierge::CancelDiskImageResponse CancelDiskImageOperation(
+      const vm_tools::concierge::CancelDiskImageRequest& in_request) = 0;
+  // Creates a disk image.
+  virtual void CreateDiskImage(
+      dbus::MethodCall* method_call,
+      brillo::dbus_utils::ResponseSender sender) = 0;
+  // Destroys a disk image.
+  virtual vm_tools::concierge::DestroyDiskImageResponse DestroyDiskImage(
+      const vm_tools::concierge::DestroyDiskImageRequest& in_request) = 0;
+  // Checks status of a disk image operation.
+  virtual vm_tools::concierge::DiskImageStatusResponse DiskImageStatus(
+      const vm_tools::concierge::DiskImageStatusRequest& in_request) = 0;
+  // Exports a VM disk image.
+  virtual void ExportDiskImage(
+      dbus::MethodCall* method_call,
+      brillo::dbus_utils::ResponseSender sender) = 0;
+  // Gets the SSH keys for a container.
+  virtual vm_tools::concierge::ContainerSshKeysResponse GetContainerSshKeys(
+      const vm_tools::concierge::ContainerSshKeysRequest& in_request) = 0;
+  // Gets VM info specific to enterprise reporting.
+  virtual vm_tools::concierge::GetVmEnterpriseReportingInfoResponse GetVmEnterpriseReportingInfo(
+      const vm_tools::concierge::GetVmEnterpriseReportingInfoRequest& in_request) = 0;
+  // Gets VM info.
+  virtual vm_tools::concierge::GetVmInfoResponse GetVmInfo(
+      const vm_tools::concierge::GetVmInfoRequest& in_request) = 0;
+  // Imports a disk image.
+  virtual vm_tools::concierge::ImportDiskImageResponse ImportDiskImage(
+      const vm_tools::concierge::ImportDiskImageRequest& in_request,
+      const base::ScopedFD& in_in_fd) = 0;
+  // Lists existing disk images.
+  virtual vm_tools::concierge::ListVmDisksResponse ListVmDisks(
+      const vm_tools::concierge::ListVmDisksRequest& in_request) = 0;
+  // Resizes a disk image. Can return asynchronously.
+  virtual vm_tools::concierge::ResizeDiskImageResponse ResizeDiskImage(
+      const vm_tools::concierge::ResizeDiskImageRequest& in_request) = 0;
+  // Resumes a VM.
+  virtual vm_tools::concierge::ResumeVmResponse ResumeVm(
+      const vm_tools::concierge::ResumeVmRequest& in_request) = 0;
+  // Updates balloon timer.
+  virtual vm_tools::concierge::SetBalloonTimerResponse SetBalloonTimer(
+      const vm_tools::concierge::SetBalloonTimerRequest& in_request) = 0;
   // Stops VM.
   virtual vm_tools::concierge::StopVmResponse StopVm(
       const vm_tools::concierge::StopVmRequest& in_request) = 0;
@@ -30,6 +78,8 @@ class VmConciergeInterface {
   // Suspends a VM.
   virtual vm_tools::concierge::SuspendVmResponse SuspendVm(
       const vm_tools::concierge::SuspendVmRequest& in_request) = 0;
+  // Updates all VMs' times to the current host time.
+  virtual vm_tools::concierge::SyncVmTimesResponse SyncVmTimes() = 0;
 };
 
 // Interface adaptor for org::chromium::VmConcierge.
@@ -44,6 +94,66 @@ class VmConciergeAdaptor {
         object->AddOrGetInterface("org.chromium.VmConcierge");
 
     itf->AddSimpleMethodHandler(
+        "AdjustVm",
+        base::Unretained(interface_),
+        &VmConciergeInterface::AdjustVm);
+    itf->AddSimpleMethodHandler(
+        "ArcVmCompleteBoot",
+        base::Unretained(interface_),
+        &VmConciergeInterface::ArcVmCompleteBoot);
+    itf->AddSimpleMethodHandler(
+        "CancelDiskImageOperation",
+        base::Unretained(interface_),
+        &VmConciergeInterface::CancelDiskImageOperation);
+    itf->AddRawMethodHandler(
+        "CreateDiskImage",
+        base::Unretained(interface_),
+        &VmConciergeInterface::CreateDiskImage);
+    itf->AddSimpleMethodHandler(
+        "DestroyDiskImage",
+        base::Unretained(interface_),
+        &VmConciergeInterface::DestroyDiskImage);
+    itf->AddSimpleMethodHandler(
+        "DiskImageStatus",
+        base::Unretained(interface_),
+        &VmConciergeInterface::DiskImageStatus);
+    itf->AddRawMethodHandler(
+        "ExportDiskImage",
+        base::Unretained(interface_),
+        &VmConciergeInterface::ExportDiskImage);
+    itf->AddSimpleMethodHandler(
+        "GetContainerSshKeys",
+        base::Unretained(interface_),
+        &VmConciergeInterface::GetContainerSshKeys);
+    itf->AddSimpleMethodHandler(
+        "GetVmEnterpriseReportingInfo",
+        base::Unretained(interface_),
+        &VmConciergeInterface::GetVmEnterpriseReportingInfo);
+    itf->AddSimpleMethodHandler(
+        "GetVmInfo",
+        base::Unretained(interface_),
+        &VmConciergeInterface::GetVmInfo);
+    itf->AddSimpleMethodHandler(
+        "ImportDiskImage",
+        base::Unretained(interface_),
+        &VmConciergeInterface::ImportDiskImage);
+    itf->AddSimpleMethodHandler(
+        "ListVmDisks",
+        base::Unretained(interface_),
+        &VmConciergeInterface::ListVmDisks);
+    itf->AddSimpleMethodHandler(
+        "ResizeDiskImage",
+        base::Unretained(interface_),
+        &VmConciergeInterface::ResizeDiskImage);
+    itf->AddSimpleMethodHandler(
+        "ResumeVm",
+        base::Unretained(interface_),
+        &VmConciergeInterface::ResumeVm);
+    itf->AddSimpleMethodHandler(
+        "SetBalloonTimer",
+        base::Unretained(interface_),
+        &VmConciergeInterface::SetBalloonTimer);
+    itf->AddSimpleMethodHandler(
         "StopVm",
         base::Unretained(interface_),
         &VmConciergeInterface::StopVm);
@@ -55,6 +165,10 @@ class VmConciergeAdaptor {
         "SuspendVm",
         base::Unretained(interface_),
         &VmConciergeInterface::SuspendVm);
+    itf->AddSimpleMethodHandler(
+        "SyncVmTimes",
+        base::Unretained(interface_),
+        &VmConciergeInterface::SyncVmTimes);
   }
 
   static dbus::ObjectPath GetObjectPath() {
@@ -64,6 +178,70 @@ class VmConciergeAdaptor {
   static const char* GetIntrospectionXml() {
     return
         "  <interface name=\"org.chromium.VmConcierge\">\n"
+        "    <method name=\"AdjustVm\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"ArcVmCompleteBoot\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"CancelDiskImageOperation\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"CreateDiskImage\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"in_fd\" type=\"h\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"DestroyDiskImage\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"DiskImageStatus\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"ExportDiskImage\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"storage_fd\" type=\"h\" direction=\"in\"/>\n"
+        "      <arg name=\"digest_fd\" type=\"h\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"GetContainerSshKeys\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"GetVmEnterpriseReportingInfo\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"GetVmInfo\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"ImportDiskImage\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"in_fd\" type=\"h\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"ListVmDisks\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"ResizeDiskImage\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"ResumeVm\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"SetBalloonTimer\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
         "    <method name=\"StopVm\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
@@ -72,6 +250,9 @@ class VmConciergeAdaptor {
         "    </method>\n"
         "    <method name=\"SuspendVm\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"SyncVmTimes\">\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "  </interface>\n";
