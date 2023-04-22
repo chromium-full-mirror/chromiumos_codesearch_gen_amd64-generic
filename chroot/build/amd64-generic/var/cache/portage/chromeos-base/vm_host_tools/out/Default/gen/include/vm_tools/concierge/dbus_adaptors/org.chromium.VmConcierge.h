@@ -28,6 +28,10 @@ class VmConciergeInterface {
   // Completes the boot of an ARCVM VM.
   virtual vm_tools::concierge::ArcVmCompleteBootResponse ArcVmCompleteBoot(
       const vm_tools::concierge::ArcVmCompleteBootRequest& in_request) = 0;
+  // Attaches a USB device to a VM.
+  virtual vm_tools::concierge::AttachUsbDeviceResponse AttachUsbDevice(
+      const vm_tools::concierge::AttachUsbDeviceRequest& in_request,
+      const base::ScopedFD& in_fd) = 0;
   // Cancels a disk image operation.
   virtual vm_tools::concierge::CancelDiskImageResponse CancelDiskImageOperation(
       const vm_tools::concierge::CancelDiskImageRequest& in_request) = 0;
@@ -38,6 +42,9 @@ class VmConciergeInterface {
   // Destroys a disk image.
   virtual vm_tools::concierge::DestroyDiskImageResponse DestroyDiskImage(
       const vm_tools::concierge::DestroyDiskImageRequest& in_request) = 0;
+  // Detaches a USB device from a VM.
+  virtual vm_tools::concierge::DetachUsbDeviceResponse DetachUsbDevice(
+      const vm_tools::concierge::DetachUsbDeviceRequest& in_request) = 0;
   // Checks status of a disk image operation.
   virtual vm_tools::concierge::DiskImageStatusResponse DiskImageStatus(
       const vm_tools::concierge::DiskImageStatusRequest& in_request) = 0;
@@ -102,6 +109,10 @@ class VmConciergeAdaptor {
         base::Unretained(interface_),
         &VmConciergeInterface::ArcVmCompleteBoot);
     itf->AddSimpleMethodHandler(
+        "AttachUsbDevice",
+        base::Unretained(interface_),
+        &VmConciergeInterface::AttachUsbDevice);
+    itf->AddSimpleMethodHandler(
         "CancelDiskImageOperation",
         base::Unretained(interface_),
         &VmConciergeInterface::CancelDiskImageOperation);
@@ -113,6 +124,10 @@ class VmConciergeAdaptor {
         "DestroyDiskImage",
         base::Unretained(interface_),
         &VmConciergeInterface::DestroyDiskImage);
+    itf->AddSimpleMethodHandler(
+        "DetachUsbDevice",
+        base::Unretained(interface_),
+        &VmConciergeInterface::DetachUsbDevice);
     itf->AddSimpleMethodHandler(
         "DiskImageStatus",
         base::Unretained(interface_),
@@ -186,6 +201,11 @@ class VmConciergeAdaptor {
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
+        "    <method name=\"AttachUsbDevice\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"fd\" type=\"h\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
         "    <method name=\"CancelDiskImageOperation\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
@@ -196,6 +216,10 @@ class VmConciergeAdaptor {
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"DestroyDiskImage\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"DetachUsbDevice\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
