@@ -55,6 +55,8 @@ class VmConciergeInterface {
   // Gets the SSH keys for a container.
   virtual vm_tools::concierge::ContainerSshKeysResponse GetContainerSshKeys(
       const vm_tools::concierge::ContainerSshKeysRequest& in_request) = 0;
+  // Gets DNS info.
+  virtual vm_tools::concierge::DnsSettings GetDnsSettings() = 0;
   // Gets VM info specific to enterprise reporting.
   virtual vm_tools::concierge::GetVmEnterpriseReportingInfoResponse GetVmEnterpriseReportingInfo(
       const vm_tools::concierge::GetVmEnterpriseReportingInfoRequest& in_request) = 0;
@@ -65,6 +67,9 @@ class VmConciergeInterface {
   virtual vm_tools::concierge::ImportDiskImageResponse ImportDiskImage(
       const vm_tools::concierge::ImportDiskImageRequest& in_request,
       const base::ScopedFD& in_in_fd) = 0;
+  // Lists USB devices.
+  virtual vm_tools::concierge::ListUsbDeviceResponse ListUsbDevices(
+      const vm_tools::concierge::ListUsbDeviceRequest& in_request) = 0;
   // Lists existing disk images.
   virtual vm_tools::concierge::ListVmDisksResponse ListVmDisks(
       const vm_tools::concierge::ListVmDisksRequest& in_request) = 0;
@@ -141,6 +146,10 @@ class VmConciergeAdaptor {
         base::Unretained(interface_),
         &VmConciergeInterface::GetContainerSshKeys);
     itf->AddSimpleMethodHandler(
+        "GetDnsSettings",
+        base::Unretained(interface_),
+        &VmConciergeInterface::GetDnsSettings);
+    itf->AddSimpleMethodHandler(
         "GetVmEnterpriseReportingInfo",
         base::Unretained(interface_),
         &VmConciergeInterface::GetVmEnterpriseReportingInfo);
@@ -152,6 +161,10 @@ class VmConciergeAdaptor {
         "ImportDiskImage",
         base::Unretained(interface_),
         &VmConciergeInterface::ImportDiskImage);
+    itf->AddSimpleMethodHandler(
+        "ListUsbDevices",
+        base::Unretained(interface_),
+        &VmConciergeInterface::ListUsbDevices);
     itf->AddSimpleMethodHandler(
         "ListVmDisks",
         base::Unretained(interface_),
@@ -237,6 +250,9 @@ class VmConciergeAdaptor {
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
+        "    <method name=\"GetDnsSettings\">\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
         "    <method name=\"GetVmEnterpriseReportingInfo\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
@@ -248,6 +264,10 @@ class VmConciergeAdaptor {
         "    <method name=\"ImportDiskImage\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"in_fd\" type=\"h\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"ListUsbDevices\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"ListVmDisks\">\n"
