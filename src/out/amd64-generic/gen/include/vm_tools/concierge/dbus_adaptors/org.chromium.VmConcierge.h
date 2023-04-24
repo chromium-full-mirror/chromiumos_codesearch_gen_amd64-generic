@@ -73,6 +73,9 @@ class VmConciergeInterface {
   // Lists existing disk images.
   virtual vm_tools::concierge::ListVmDisksResponse ListVmDisks(
       const vm_tools::concierge::ListVmDisksRequest& in_request) = 0;
+  // Lists Vms.
+  virtual vm_tools::concierge::ListVmsResponse ListVms(
+      const vm_tools::concierge::ListVmsRequest& in_request) = 0;
   // Resizes a disk image. Can return asynchronously.
   virtual vm_tools::concierge::ResizeDiskImageResponse ResizeDiskImage(
       const vm_tools::concierge::ResizeDiskImageRequest& in_request) = 0;
@@ -82,6 +85,9 @@ class VmConciergeInterface {
   // Updates balloon timer.
   virtual vm_tools::concierge::SetBalloonTimerResponse SetBalloonTimer(
       const vm_tools::concierge::SetBalloonTimerRequest& in_request) = 0;
+  // Set VM's CPU restriction state.
+  virtual vm_tools::concierge::SetVmCpuRestrictionResponse SetVmCpuRestriction(
+      const vm_tools::concierge::SetVmCpuRestrictionRequest& in_request) = 0;
   // Stops VM.
   virtual vm_tools::concierge::StopVmResponse StopVm(
       const vm_tools::concierge::StopVmRequest& in_request) = 0;
@@ -170,6 +176,10 @@ class VmConciergeAdaptor {
         base::Unretained(interface_),
         &VmConciergeInterface::ListVmDisks);
     itf->AddSimpleMethodHandler(
+        "ListVms",
+        base::Unretained(interface_),
+        &VmConciergeInterface::ListVms);
+    itf->AddSimpleMethodHandler(
         "ResizeDiskImage",
         base::Unretained(interface_),
         &VmConciergeInterface::ResizeDiskImage);
@@ -181,6 +191,10 @@ class VmConciergeAdaptor {
         "SetBalloonTimer",
         base::Unretained(interface_),
         &VmConciergeInterface::SetBalloonTimer);
+    itf->AddSimpleMethodHandler(
+        "SetVmCpuRestriction",
+        base::Unretained(interface_),
+        &VmConciergeInterface::SetVmCpuRestriction);
     itf->AddSimpleMethodHandler(
         "StopVm",
         base::Unretained(interface_),
@@ -274,6 +288,10 @@ class VmConciergeAdaptor {
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
+        "    <method name=\"ListVms\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
         "    <method name=\"ResizeDiskImage\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
@@ -283,6 +301,10 @@ class VmConciergeAdaptor {
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"SetBalloonTimer\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"SetVmCpuRestriction\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
