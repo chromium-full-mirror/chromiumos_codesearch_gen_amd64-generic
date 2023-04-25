@@ -22,6 +22,10 @@ class VmConciergeInterface {
  public:
   virtual ~VmConciergeInterface() = default;
 
+  // Adds group permission to directories created by mesa for a specified VM.
+  virtual bool AddGroupPermissionMesa(
+      brillo::ErrorPtr* error,
+      const vm_tools::concierge::AddGroupPermissionMesaRequest& in_request) = 0;
   // Adjusts parameters of a given VM.
   virtual vm_tools::concierge::AdjustVmResponse AdjustVm(
       const vm_tools::concierge::AdjustVmRequest& in_request) = 0;
@@ -60,9 +64,17 @@ class VmConciergeInterface {
   // Gets VM info specific to enterprise reporting.
   virtual vm_tools::concierge::GetVmEnterpriseReportingInfoResponse GetVmEnterpriseReportingInfo(
       const vm_tools::concierge::GetVmEnterpriseReportingInfoRequest& in_request) = 0;
+  // Gets VM's GPU cache path.
+  virtual bool GetVmGpuCachePath(
+      brillo::ErrorPtr* error,
+      const vm_tools::concierge::GetVmGpuCachePathRequest& in_request,
+      vm_tools::concierge::GetVmGpuCachePathResponse* out_response) = 0;
   // Gets VM info.
   virtual vm_tools::concierge::GetVmInfoResponse GetVmInfo(
       const vm_tools::concierge::GetVmInfoRequest& in_request) = 0;
+  // Get if allowed to launch VM.
+  virtual vm_tools::concierge::GetVmLaunchAllowedResponse GetVmLaunchAllowed(
+      const vm_tools::concierge::GetVmLaunchAllowedRequest& in_response) = 0;
   // Imports a disk image.
   virtual vm_tools::concierge::ImportDiskImageResponse ImportDiskImage(
       const vm_tools::concierge::ImportDiskImageRequest& in_request,
@@ -111,6 +123,10 @@ class VmConciergeAdaptor {
     brillo::dbus_utils::DBusInterface* itf =
         object->AddOrGetInterface("org.chromium.VmConcierge");
 
+    itf->AddSimpleMethodHandlerWithError(
+        "AddGroupPermissionMesa",
+        base::Unretained(interface_),
+        &VmConciergeInterface::AddGroupPermissionMesa);
     itf->AddSimpleMethodHandler(
         "AdjustVm",
         base::Unretained(interface_),
@@ -159,10 +175,18 @@ class VmConciergeAdaptor {
         "GetVmEnterpriseReportingInfo",
         base::Unretained(interface_),
         &VmConciergeInterface::GetVmEnterpriseReportingInfo);
+    itf->AddSimpleMethodHandlerWithError(
+        "GetVmGpuCachePath",
+        base::Unretained(interface_),
+        &VmConciergeInterface::GetVmGpuCachePath);
     itf->AddSimpleMethodHandler(
         "GetVmInfo",
         base::Unretained(interface_),
         &VmConciergeInterface::GetVmInfo);
+    itf->AddSimpleMethodHandler(
+        "GetVmLaunchAllowed",
+        base::Unretained(interface_),
+        &VmConciergeInterface::GetVmLaunchAllowed);
     itf->AddSimpleMethodHandler(
         "ImportDiskImage",
         base::Unretained(interface_),
@@ -220,6 +244,9 @@ class VmConciergeAdaptor {
   static const char* GetIntrospectionXml() {
     return
         "  <interface name=\"org.chromium.VmConcierge\">\n"
+        "    <method name=\"AddGroupPermissionMesa\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "    </method>\n"
         "    <method name=\"AdjustVm\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
@@ -271,8 +298,16 @@ class VmConciergeAdaptor {
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
+        "    <method name=\"GetVmGpuCachePath\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
         "    <method name=\"GetVmInfo\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"GetVmLaunchAllowed\">\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"ImportDiskImage\">\n"
