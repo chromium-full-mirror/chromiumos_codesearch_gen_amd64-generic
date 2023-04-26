@@ -84,6 +84,10 @@ class VmConciergeInterface {
   virtual vm_tools::concierge::ImportDiskImageResponse ImportDiskImage(
       const vm_tools::concierge::ImportDiskImageRequest& in_request,
       const base::ScopedFD& in_in_fd) = 0;
+  // Installs the Pflash image associated with a VM.
+  virtual vm_tools::concierge::InstallPflashResponse InstallPflash(
+      const vm_tools::concierge::InstallPflashRequest& in_request,
+      const base::ScopedFD& in_plash_src_fd) = 0;
   // Lists USB devices.
   virtual vm_tools::concierge::ListUsbDeviceResponse ListUsbDevices(
       const vm_tools::concierge::ListUsbDeviceRequest& in_request) = 0;
@@ -113,6 +117,9 @@ class VmConciergeInterface {
   // Suspends a VM.
   virtual vm_tools::concierge::SuspendVmResponse SuspendVm(
       const vm_tools::concierge::SuspendVmRequest& in_request) = 0;
+  // Handles a request to change VM swap state.
+  virtual vm_tools::concierge::SwapVmResponse SwapVm(
+      const vm_tools::concierge::SwapVmRequest& in_request) = 0;
   // Updates all VMs' times to the current host time.
   virtual vm_tools::concierge::SyncVmTimesResponse SyncVmTimes() = 0;
 };
@@ -201,6 +208,10 @@ class VmConciergeAdaptor {
         base::Unretained(interface_),
         &VmConciergeInterface::ImportDiskImage);
     itf->AddSimpleMethodHandler(
+        "InstallPflash",
+        base::Unretained(interface_),
+        &VmConciergeInterface::InstallPflash);
+    itf->AddSimpleMethodHandler(
         "ListUsbDevices",
         base::Unretained(interface_),
         &VmConciergeInterface::ListUsbDevices);
@@ -240,6 +251,10 @@ class VmConciergeAdaptor {
         "SuspendVm",
         base::Unretained(interface_),
         &VmConciergeInterface::SuspendVm);
+    itf->AddSimpleMethodHandler(
+        "SwapVm",
+        base::Unretained(interface_),
+        &VmConciergeInterface::SwapVm);
     itf->AddSimpleMethodHandler(
         "SyncVmTimes",
         base::Unretained(interface_),
@@ -328,6 +343,11 @@ class VmConciergeAdaptor {
         "      <arg name=\"in_fd\" type=\"h\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
+        "    <method name=\"InstallPflash\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"plash_src_fd\" type=\"h\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
         "    <method name=\"ListUsbDevices\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
@@ -363,6 +383,10 @@ class VmConciergeAdaptor {
         "    <method name=\"StopAllVms\">\n"
         "    </method>\n"
         "    <method name=\"SuspendVm\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"SwapVm\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
