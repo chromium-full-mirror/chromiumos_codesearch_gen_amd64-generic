@@ -75,6 +75,11 @@ class VmConciergeInterface {
   // Get if allowed to launch VM.
   virtual vm_tools::concierge::GetVmLaunchAllowedResponse GetVmLaunchAllowed(
       const vm_tools::concierge::GetVmLaunchAllowedRequest& in_response) = 0;
+  // Gets VM logs.
+  virtual bool GetVmLogs(
+      brillo::ErrorPtr* error,
+      const vm_tools::concierge::GetVmLogsRequest& in_request,
+      vm_tools::concierge::GetVmLogsResponse* out_response) = 0;
   // Imports a disk image.
   virtual vm_tools::concierge::ImportDiskImageResponse ImportDiskImage(
       const vm_tools::concierge::ImportDiskImageRequest& in_request,
@@ -187,6 +192,10 @@ class VmConciergeAdaptor {
         "GetVmLaunchAllowed",
         base::Unretained(interface_),
         &VmConciergeInterface::GetVmLaunchAllowed);
+    itf->AddSimpleMethodHandlerWithError(
+        "GetVmLogs",
+        base::Unretained(interface_),
+        &VmConciergeInterface::GetVmLogs);
     itf->AddSimpleMethodHandler(
         "ImportDiskImage",
         base::Unretained(interface_),
@@ -308,6 +317,10 @@ class VmConciergeAdaptor {
         "    </method>\n"
         "    <method name=\"GetVmLaunchAllowed\">\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"GetVmLogs\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"ImportDiskImage\">\n"
