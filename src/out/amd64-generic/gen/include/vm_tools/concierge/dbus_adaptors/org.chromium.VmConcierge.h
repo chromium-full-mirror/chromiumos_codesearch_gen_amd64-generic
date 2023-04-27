@@ -259,6 +259,24 @@ class VmConciergeAdaptor {
         "SyncVmTimes",
         base::Unretained(interface_),
         &VmConciergeInterface::SyncVmTimes);
+
+    signal_VmStartedSignal_ = itf->RegisterSignalOfType<SignalVmStartedSignalType>("VmStartedSignal");
+    signal_VmStartingUpSignal_ = itf->RegisterSignalOfType<SignalVmStartingUpSignalType>("VmStartingUpSignal");
+  }
+
+  void SendVmStartedSignalSignal(
+      const vm_tools::concierge::VmStartedSignal& in_signal) {
+    auto signal = signal_VmStartedSignal_.lock();
+    if (signal)
+      signal->Send(in_signal);
+  }
+  // Indicates a new vm is starting so logging can be captured as early as
+  // possible.
+  void SendVmStartingUpSignalSignal(
+      const vm_tools::concierge::ExtendedVmInfo& in_signal) {
+    auto signal = signal_VmStartingUpSignal_.lock();
+    if (signal)
+      signal->Send(in_signal);
   }
 
   static dbus::ObjectPath GetObjectPath() {
@@ -393,10 +411,24 @@ class VmConciergeAdaptor {
         "    <method name=\"SyncVmTimes\">\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
+        "    <signal name=\"VmStartedSignal\">\n"
+        "      <arg name=\"signal\" type=\"ay\"/>\n"
+        "    </signal>\n"
+        "    <signal name=\"VmStartingUpSignal\">\n"
+        "      <arg name=\"signal\" type=\"ay\"/>\n"
+        "    </signal>\n"
         "  </interface>\n";
   }
 
  private:
+  using SignalVmStartedSignalType = brillo::dbus_utils::DBusSignal<
+      vm_tools::concierge::VmStartedSignal /*signal*/>;
+  std::weak_ptr<SignalVmStartedSignalType> signal_VmStartedSignal_;
+
+  using SignalVmStartingUpSignalType = brillo::dbus_utils::DBusSignal<
+      vm_tools::concierge::ExtendedVmInfo /*signal*/>;
+  std::weak_ptr<SignalVmStartingUpSignalType> signal_VmStartingUpSignal_;
+
   VmConciergeInterface* interface_;  // Owned by container of this adapter.
 };
 
