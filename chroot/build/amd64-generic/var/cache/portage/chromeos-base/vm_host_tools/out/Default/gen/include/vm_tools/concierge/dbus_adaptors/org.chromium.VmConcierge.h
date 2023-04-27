@@ -59,8 +59,6 @@ class VmConciergeInterface {
   // Gets the SSH keys for a container.
   virtual vm_tools::concierge::ContainerSshKeysResponse GetContainerSshKeys(
       const vm_tools::concierge::ContainerSshKeysRequest& in_request) = 0;
-  // Gets DNS info.
-  virtual vm_tools::concierge::DnsSettings GetDnsSettings() = 0;
   // Gets VM info specific to enterprise reporting.
   virtual vm_tools::concierge::GetVmEnterpriseReportingInfoResponse GetVmEnterpriseReportingInfo(
       const vm_tools::concierge::GetVmEnterpriseReportingInfoRequest& in_request) = 0;
@@ -84,10 +82,6 @@ class VmConciergeInterface {
   virtual vm_tools::concierge::ImportDiskImageResponse ImportDiskImage(
       const vm_tools::concierge::ImportDiskImageRequest& in_request,
       const base::ScopedFD& in_in_fd) = 0;
-  // Installs the Pflash image associated with a VM.
-  virtual vm_tools::concierge::InstallPflashResponse InstallPflash(
-      const vm_tools::concierge::InstallPflashRequest& in_request,
-      const base::ScopedFD& in_plash_src_fd) = 0;
   // Lists USB devices.
   virtual vm_tools::concierge::ListUsbDeviceResponse ListUsbDevices(
       const vm_tools::concierge::ListUsbDeviceRequest& in_request) = 0;
@@ -180,10 +174,6 @@ class VmConciergeAdaptor {
         base::Unretained(interface_),
         &VmConciergeInterface::GetContainerSshKeys);
     itf->AddSimpleMethodHandler(
-        "GetDnsSettings",
-        base::Unretained(interface_),
-        &VmConciergeInterface::GetDnsSettings);
-    itf->AddSimpleMethodHandler(
         "GetVmEnterpriseReportingInfo",
         base::Unretained(interface_),
         &VmConciergeInterface::GetVmEnterpriseReportingInfo);
@@ -207,10 +197,6 @@ class VmConciergeAdaptor {
         "ImportDiskImage",
         base::Unretained(interface_),
         &VmConciergeInterface::ImportDiskImage);
-    itf->AddSimpleMethodHandler(
-        "InstallPflash",
-        base::Unretained(interface_),
-        &VmConciergeInterface::InstallPflash);
     itf->AddSimpleMethodHandler(
         "ListUsbDevices",
         base::Unretained(interface_),
@@ -260,10 +246,22 @@ class VmConciergeAdaptor {
         base::Unretained(interface_),
         &VmConciergeInterface::SyncVmTimes);
 
+    signal_DiskImageProgress_ = itf->RegisterSignalOfType<SignalDiskImageProgressType>("DiskImageProgress");
     signal_VmStartedSignal_ = itf->RegisterSignalOfType<SignalVmStartedSignalType>("VmStartedSignal");
     signal_VmStartingUpSignal_ = itf->RegisterSignalOfType<SignalVmStartingUpSignalType>("VmStartingUpSignal");
+    signal_VmStoppedSignal_ = itf->RegisterSignalOfType<SignalVmStoppedSignalType>("VmStoppedSignal");
+    signal_VmStoppingSignal_ = itf->RegisterSignalOfType<SignalVmStoppingSignalType>("VmStoppingSignal");
   }
 
+  // Signaled by Concierge after an ImportDiskImage
+  // call has been made and an update about the status of the import
+  // is available.
+  void SendDiskImageProgressSignal(
+      const vm_tools::concierge::DiskImageStatusResponse& in_signal) {
+    auto signal = signal_DiskImageProgress_.lock();
+    if (signal)
+      signal->Send(in_signal);
+  }
   void SendVmStartedSignalSignal(
       const vm_tools::concierge::VmStartedSignal& in_signal) {
     auto signal = signal_VmStartedSignal_.lock();
@@ -275,6 +273,18 @@ class VmConciergeAdaptor {
   void SendVmStartingUpSignalSignal(
       const vm_tools::concierge::ExtendedVmInfo& in_signal) {
     auto signal = signal_VmStartingUpSignal_.lock();
+    if (signal)
+      signal->Send(in_signal);
+  }
+  void SendVmStoppedSignalSignal(
+      const vm_tools::concierge::VmStoppedSignal& in_signal) {
+    auto signal = signal_VmStoppedSignal_.lock();
+    if (signal)
+      signal->Send(in_signal);
+  }
+  void SendVmStoppingSignalSignal(
+      const vm_tools::concierge::VmStoppingSignal& in_signal) {
+    auto signal = signal_VmStoppingSignal_.lock();
     if (signal)
       signal->Send(in_signal);
   }
@@ -333,9 +343,6 @@ class VmConciergeAdaptor {
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
-        "    <method name=\"GetDnsSettings\">\n"
-        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
-        "    </method>\n"
         "    <method name=\"GetVmEnterpriseReportingInfo\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
@@ -359,11 +366,6 @@ class VmConciergeAdaptor {
         "    <method name=\"ImportDiskImage\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"in_fd\" type=\"h\" direction=\"in\"/>\n"
-        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
-        "    </method>\n"
-        "    <method name=\"InstallPflash\">\n"
-        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
-        "      <arg name=\"plash_src_fd\" type=\"h\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"ListUsbDevices\">\n"
@@ -411,16 +413,29 @@ class VmConciergeAdaptor {
         "    <method name=\"SyncVmTimes\">\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
+        "    <signal name=\"DiskImageProgress\">\n"
+        "      <arg name=\"signal\" type=\"ay\"/>\n"
+        "    </signal>\n"
         "    <signal name=\"VmStartedSignal\">\n"
         "      <arg name=\"signal\" type=\"ay\"/>\n"
         "    </signal>\n"
         "    <signal name=\"VmStartingUpSignal\">\n"
         "      <arg name=\"signal\" type=\"ay\"/>\n"
         "    </signal>\n"
+        "    <signal name=\"VmStoppedSignal\">\n"
+        "      <arg name=\"signal\" type=\"ay\"/>\n"
+        "    </signal>\n"
+        "    <signal name=\"VmStoppingSignal\">\n"
+        "      <arg name=\"signal\" type=\"ay\"/>\n"
+        "    </signal>\n"
         "  </interface>\n";
   }
 
  private:
+  using SignalDiskImageProgressType = brillo::dbus_utils::DBusSignal<
+      vm_tools::concierge::DiskImageStatusResponse /*signal*/>;
+  std::weak_ptr<SignalDiskImageProgressType> signal_DiskImageProgress_;
+
   using SignalVmStartedSignalType = brillo::dbus_utils::DBusSignal<
       vm_tools::concierge::VmStartedSignal /*signal*/>;
   std::weak_ptr<SignalVmStartedSignalType> signal_VmStartedSignal_;
@@ -428,6 +443,14 @@ class VmConciergeAdaptor {
   using SignalVmStartingUpSignalType = brillo::dbus_utils::DBusSignal<
       vm_tools::concierge::ExtendedVmInfo /*signal*/>;
   std::weak_ptr<SignalVmStartingUpSignalType> signal_VmStartingUpSignal_;
+
+  using SignalVmStoppedSignalType = brillo::dbus_utils::DBusSignal<
+      vm_tools::concierge::VmStoppedSignal /*signal*/>;
+  std::weak_ptr<SignalVmStoppedSignalType> signal_VmStoppedSignal_;
+
+  using SignalVmStoppingSignalType = brillo::dbus_utils::DBusSignal<
+      vm_tools::concierge::VmStoppingSignal /*signal*/>;
+  std::weak_ptr<SignalVmStoppingSignalType> signal_VmStoppingSignal_;
 
   VmConciergeInterface* interface_;  // Owned by container of this adapter.
 };
