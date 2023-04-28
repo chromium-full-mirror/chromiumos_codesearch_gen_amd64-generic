@@ -82,6 +82,10 @@ class VmConciergeInterface {
   virtual vm_tools::concierge::ImportDiskImageResponse ImportDiskImage(
       const vm_tools::concierge::ImportDiskImageRequest& in_request,
       const base::ScopedFD& in_in_fd) = 0;
+  // Installs the Pflash image associated with a VM.
+  virtual vm_tools::concierge::InstallPflashResponse InstallPflash(
+      const vm_tools::concierge::InstallPflashRequest& in_request,
+      const base::ScopedFD& in_plash_src_fd) = 0;
   // Lists USB devices.
   virtual vm_tools::concierge::ListUsbDeviceResponse ListUsbDevices(
       const vm_tools::concierge::ListUsbDeviceRequest& in_request) = 0;
@@ -197,6 +201,10 @@ class VmConciergeAdaptor {
         "ImportDiskImage",
         base::Unretained(interface_),
         &VmConciergeInterface::ImportDiskImage);
+    itf->AddSimpleMethodHandler(
+        "InstallPflash",
+        base::Unretained(interface_),
+        &VmConciergeInterface::InstallPflash);
     itf->AddSimpleMethodHandler(
         "ListUsbDevices",
         base::Unretained(interface_),
@@ -366,6 +374,11 @@ class VmConciergeAdaptor {
         "    <method name=\"ImportDiskImage\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"in_fd\" type=\"h\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"InstallPflash\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"plash_src_fd\" type=\"h\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"ListUsbDevices\">\n"
