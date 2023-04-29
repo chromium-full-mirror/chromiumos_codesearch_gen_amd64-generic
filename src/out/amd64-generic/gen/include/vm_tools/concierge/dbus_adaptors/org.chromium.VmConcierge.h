@@ -56,9 +56,6 @@ class VmConciergeInterface {
   virtual void ExportDiskImage(
       dbus::MethodCall* method_call,
       brillo::dbus_utils::ResponseSender sender) = 0;
-  // Gets the SSH keys for a container.
-  virtual vm_tools::concierge::ContainerSshKeysResponse GetContainerSshKeys(
-      const vm_tools::concierge::ContainerSshKeysRequest& in_request) = 0;
   // Gets VM info specific to enterprise reporting.
   virtual vm_tools::concierge::GetVmEnterpriseReportingInfoResponse GetVmEnterpriseReportingInfo(
       const vm_tools::concierge::GetVmEnterpriseReportingInfoRequest& in_request) = 0;
@@ -174,10 +171,6 @@ class VmConciergeAdaptor {
         base::Unretained(interface_),
         &VmConciergeInterface::ExportDiskImage);
     itf->AddSimpleMethodHandler(
-        "GetContainerSshKeys",
-        base::Unretained(interface_),
-        &VmConciergeInterface::GetContainerSshKeys);
-    itf->AddSimpleMethodHandler(
         "GetVmEnterpriseReportingInfo",
         base::Unretained(interface_),
         &VmConciergeInterface::GetVmEnterpriseReportingInfo);
@@ -255,10 +248,12 @@ class VmConciergeAdaptor {
         &VmConciergeInterface::SyncVmTimes);
 
     signal_DiskImageProgress_ = itf->RegisterSignalOfType<SignalDiskImageProgressType>("DiskImageProgress");
+    signal_VmGuestUserlandReadySignal_ = itf->RegisterSignalOfType<SignalVmGuestUserlandReadySignalType>("VmGuestUserlandReadySignal");
     signal_VmStartedSignal_ = itf->RegisterSignalOfType<SignalVmStartedSignalType>("VmStartedSignal");
     signal_VmStartingUpSignal_ = itf->RegisterSignalOfType<SignalVmStartingUpSignalType>("VmStartingUpSignal");
     signal_VmStoppedSignal_ = itf->RegisterSignalOfType<SignalVmStoppedSignalType>("VmStoppedSignal");
     signal_VmStoppingSignal_ = itf->RegisterSignalOfType<SignalVmStoppingSignalType>("VmStoppingSignal");
+    signal_VmSwappingSignal_ = itf->RegisterSignalOfType<SignalVmSwappingSignalType>("VmSwappingSignal");
   }
 
   // Signaled by Concierge after an ImportDiskImage
@@ -267,6 +262,12 @@ class VmConciergeAdaptor {
   void SendDiskImageProgressSignal(
       const vm_tools::concierge::DiskImageStatusResponse& in_signal) {
     auto signal = signal_DiskImageProgress_.lock();
+    if (signal)
+      signal->Send(in_signal);
+  }
+  void SendVmGuestUserlandReadySignalSignal(
+      const vm_tools::concierge::VmGuestUserlandReadySignal& in_signal) {
+    auto signal = signal_VmGuestUserlandReadySignal_.lock();
     if (signal)
       signal->Send(in_signal);
   }
@@ -293,6 +294,14 @@ class VmConciergeAdaptor {
   void SendVmStoppingSignalSignal(
       const vm_tools::concierge::VmStoppingSignal& in_signal) {
     auto signal = signal_VmStoppingSignal_.lock();
+    if (signal)
+      signal->Send(in_signal);
+  }
+  // Indicates a VM is starting memory swap out so the receiver can
+  // expect the VM will experience a transitional jank.
+  void SendVmSwappingSignalSignal(
+      const vm_tools::concierge::VmSwappingSignal& in_signal) {
+    auto signal = signal_VmSwappingSignal_.lock();
     if (signal)
       signal->Send(in_signal);
   }
@@ -345,10 +354,6 @@ class VmConciergeAdaptor {
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"storage_fd\" type=\"h\" direction=\"in\"/>\n"
         "      <arg name=\"digest_fd\" type=\"h\" direction=\"in\"/>\n"
-        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
-        "    </method>\n"
-        "    <method name=\"GetContainerSshKeys\">\n"
-        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"GetVmEnterpriseReportingInfo\">\n"
@@ -429,6 +434,9 @@ class VmConciergeAdaptor {
         "    <signal name=\"DiskImageProgress\">\n"
         "      <arg name=\"signal\" type=\"ay\"/>\n"
         "    </signal>\n"
+        "    <signal name=\"VmGuestUserlandReadySignal\">\n"
+        "      <arg name=\"signal\" type=\"ay\"/>\n"
+        "    </signal>\n"
         "    <signal name=\"VmStartedSignal\">\n"
         "      <arg name=\"signal\" type=\"ay\"/>\n"
         "    </signal>\n"
@@ -441,6 +449,9 @@ class VmConciergeAdaptor {
         "    <signal name=\"VmStoppingSignal\">\n"
         "      <arg name=\"signal\" type=\"ay\"/>\n"
         "    </signal>\n"
+        "    <signal name=\"VmSwappingSignal\">\n"
+        "      <arg name=\"signal\" type=\"ay\"/>\n"
+        "    </signal>\n"
         "  </interface>\n";
   }
 
@@ -448,6 +459,10 @@ class VmConciergeAdaptor {
   using SignalDiskImageProgressType = brillo::dbus_utils::DBusSignal<
       vm_tools::concierge::DiskImageStatusResponse /*signal*/>;
   std::weak_ptr<SignalDiskImageProgressType> signal_DiskImageProgress_;
+
+  using SignalVmGuestUserlandReadySignalType = brillo::dbus_utils::DBusSignal<
+      vm_tools::concierge::VmGuestUserlandReadySignal /*signal*/>;
+  std::weak_ptr<SignalVmGuestUserlandReadySignalType> signal_VmGuestUserlandReadySignal_;
 
   using SignalVmStartedSignalType = brillo::dbus_utils::DBusSignal<
       vm_tools::concierge::VmStartedSignal /*signal*/>;
@@ -464,6 +479,10 @@ class VmConciergeAdaptor {
   using SignalVmStoppingSignalType = brillo::dbus_utils::DBusSignal<
       vm_tools::concierge::VmStoppingSignal /*signal*/>;
   std::weak_ptr<SignalVmStoppingSignalType> signal_VmStoppingSignal_;
+
+  using SignalVmSwappingSignalType = brillo::dbus_utils::DBusSignal<
+      vm_tools::concierge::VmSwappingSignal /*signal*/>;
+  std::weak_ptr<SignalVmSwappingSignalType> signal_VmSwappingSignal_;
 
   VmConciergeInterface* interface_;  // Owned by container of this adapter.
 };
