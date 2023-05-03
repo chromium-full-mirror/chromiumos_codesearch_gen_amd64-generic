@@ -33,8 +33,8 @@ typedef struct UsbDeviceEntry {
 } UsbDeviceEntry;
 
 /**
- * Similar to internally used `BalloonStats` but using i64 instead of
- * Option<u64>. `None` (or values bigger than i64::max) will be encoded as -1.
+ * Similar to internally used `BalloonStats` but using `i64` instead of
+ * `Option<u64>`. `None` (or values bigger than `i64::max`) will be encoded as -1.
  */
 typedef struct BalloonStatsFfi {
   int64_t swap_in;
