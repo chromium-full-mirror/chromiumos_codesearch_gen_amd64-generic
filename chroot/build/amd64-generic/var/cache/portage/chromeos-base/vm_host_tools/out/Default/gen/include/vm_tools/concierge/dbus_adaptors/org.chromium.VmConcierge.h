@@ -92,6 +92,11 @@ class VmConciergeInterface {
   // Lists Vms.
   virtual vm_tools::concierge::ListVmsResponse ListVms(
       const vm_tools::concierge::ListVmsRequest& in_request) = 0;
+  // Inflate balloon in a vm until perceptible processes in the guest are
+  // tried to kill.
+  virtual void AggressiveBalloon(
+      std::unique_ptr<brillo::dbus_utils::DBusMethodResponse<vm_tools::concierge::AggressiveBalloonResponse>> response,
+      const vm_tools::concierge::AggressiveBalloonRequest& in_request) = 0;
   // Resizes a disk image. Can return asynchronously.
   virtual vm_tools::concierge::ResizeDiskImageResponse ResizeDiskImage(
       const vm_tools::concierge::ResizeDiskImageRequest& in_request) = 0;
@@ -210,6 +215,10 @@ class VmConciergeAdaptor {
         "ListVms",
         base::Unretained(interface_),
         &VmConciergeInterface::ListVms);
+    itf->AddMethodHandler(
+        "AggressiveBalloon",
+        base::Unretained(interface_),
+        &VmConciergeInterface::AggressiveBalloon);
     itf->AddSimpleMethodHandler(
         "ResizeDiskImage",
         base::Unretained(interface_),
@@ -395,6 +404,10 @@ class VmConciergeAdaptor {
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"ListVms\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"AggressiveBalloon\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"

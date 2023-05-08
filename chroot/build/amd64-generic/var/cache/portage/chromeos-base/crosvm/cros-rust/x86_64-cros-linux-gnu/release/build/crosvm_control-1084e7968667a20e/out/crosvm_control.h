@@ -15,6 +15,123 @@
 #include <stdlib.h>
 
 /**
+ * Current state of vmm-swap.
+ *
+ * This should not contain fields but be a plain enum because this will be displayed to user using
+ * `serde_json` crate.
+ */
+typedef enum SwapState {
+  /**
+   * vmm-swap is ready. userfaultfd is disabled until vmm-swap is enabled.
+   */
+  READY = 0,
+  /**
+   * swap out failed.
+   */
+  FAILED = 1,
+  /**
+   * Pages in guest memory are moved to the staging memory.
+   */
+  PENDING = 2,
+  /**
+   * Trimming staging memory.
+   */
+  TRIM_IN_PROGRESS = 3,
+  /**
+   * swap-out is in progress.
+   */
+  SWAP_OUT_IN_PROGRESS = 4,
+  /**
+   * swap out succeeded.
+   */
+  ACTIVE = 5,
+  /**
+   * swap-in is in progress.
+   */
+  SWAP_IN_IN_PROGRESS = 6,
+} SwapState;
+
+/**
+ * Current metrics of vmm-swap.
+ *
+ * This is only available while vmm-swap is enabled.
+ */
+typedef struct SwapMetrics {
+  /**
+   * count of pages on RAM.
+   */
+  uint64_t resident_pages;
+  /**
+   * count of pages copied from the vmm-swap file.
+   */
+  uint64_t copied_from_file_pages;
+  /**
+   * count of pages copied from the staging memory.
+   */
+  uint64_t copied_from_staging_pages;
+  /**
+   * count of pages initialized with zero.
+   */
+  uint64_t zeroed_pages;
+  /**
+   * count of pages which were already initialized on page faults. This can happen when several
+   * threads/processes access the uninitialized/removed page at the same time.
+   */
+  uint64_t redundant_pages;
+  /**
+   * count of pages in staging memory.
+   */
+  uint64_t staging_pages;
+  /**
+   * count of pages in swap files.
+   */
+  uint64_t swap_pages;
+} SwapMetrics;
+
+/**
+ * Latency and number of pages of swap operations (move to staging, swap out, swap in).
+ *
+ * The meaning of `StateTransition` depends on `State`.
+ *
+ * | `State`             | `StateTransition`                            |
+ * |---------------------|----------------------------------------------|
+ * | `Ready`             | empty or transition record of `swap disable` |
+ * | `Pending`           | transition record of `swap enable`           |
+ * | `SwapOutInProgress` | transition record of `swap out`              |
+ * | `Active`            | transition record of `swap out`              |
+ * | `SwapInInProgress`  | transition record of `swap disable`          |
+ * | `Failed`            | empty                                        |
+ */
+typedef struct SwapStateTransition {
+  /**
+   * The number of pages moved for the state transition.
+   */
+  uint64_t pages;
+  /**
+   * Time taken for the state transition.
+   */
+  uint64_t time_ms;
+} SwapStateTransition;
+
+/**
+ * The response to `crosvm swap status` command.
+ */
+typedef struct SwapStatus {
+  /**
+   * Current vmm-swap [SwapState].
+   */
+  enum SwapState state;
+  /**
+   * Current [SwapMetrics] of vmm-swap.
+   */
+  struct SwapMetrics metrics;
+  /**
+   * Latency and number of pages for current [SwapState]. See [SwapStateTransition] for details.
+   */
+  struct SwapStateTransition state_transition;
+} SwapStatus;
+
+/**
  * Represents an individual attached USB device.
  */
 typedef struct UsbDeviceEntry {
@@ -186,6 +303,36 @@ bool crosvm_client_swap_swapout_vm(const char *socket_path);
  * null pointers are passed.
  */
 bool crosvm_client_swap_disable_vm(const char *socket_path);
+
+/**
+ * Trim staging memory for vmm swap for crosvm instance whose control socket is listening on
+ * `socket_path`.
+ *
+ * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
+ */
+bool crosvm_client_swap_trim(const char *socket_path);
+
+/**
+ * Returns vmm-swap status of the crosvm instance whose control socket is listening on
+ * `socket_path`.
+ *
+ * The parameters `status` is optional and will only be written to if they are non-null.
+ *
+ * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
+ */
+bool crosvm_client_swap_status(const char *socket_path, struct SwapStatus *status);
 
 /**
  * Simply returns the maximum possible number of USB devices
