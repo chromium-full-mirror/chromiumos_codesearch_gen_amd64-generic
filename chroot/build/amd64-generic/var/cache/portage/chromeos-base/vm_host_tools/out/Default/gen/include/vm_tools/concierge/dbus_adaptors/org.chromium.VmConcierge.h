@@ -56,6 +56,8 @@ class VmConciergeInterface {
   virtual void ExportDiskImage(
       dbus::MethodCall* method_call,
       brillo::dbus_utils::ResponseSender sender) = 0;
+  // Gets DNS info.
+  virtual vm_tools::concierge::DnsSettings GetDnsSettings() = 0;
   // Gets VM info specific to enterprise reporting.
   virtual vm_tools::concierge::GetVmEnterpriseReportingInfoResponse GetVmEnterpriseReportingInfo(
       const vm_tools::concierge::GetVmEnterpriseReportingInfoRequest& in_request) = 0;
@@ -175,6 +177,10 @@ class VmConciergeAdaptor {
         "ExportDiskImage",
         base::Unretained(interface_),
         &VmConciergeInterface::ExportDiskImage);
+    itf->AddSimpleMethodHandler(
+        "GetDnsSettings",
+        base::Unretained(interface_),
+        &VmConciergeInterface::GetDnsSettings);
     itf->AddSimpleMethodHandler(
         "GetVmEnterpriseReportingInfo",
         base::Unretained(interface_),
@@ -370,6 +376,9 @@ class VmConciergeAdaptor {
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"storage_fd\" type=\"h\" direction=\"in\"/>\n"
         "      <arg name=\"digest_fd\" type=\"h\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"GetDnsSettings\">\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"GetVmEnterpriseReportingInfo\">\n"
