@@ -274,12 +274,17 @@ class VmConciergeAdaptor {
     if (signal)
       signal->Send(in_signal);
   }
+  // Indicates VM started up and guest user space system application is ready
+  // for communication. Useful for detecting when to stop boosting guest OS
+  // for short-term boot performance.
   void SendVmGuestUserlandReadySignalSignal(
       const vm_tools::concierge::VmGuestUserlandReadySignal& in_signal) {
     auto signal = signal_VmGuestUserlandReadySignal_.lock();
     if (signal)
       signal->Send(in_signal);
   }
+  // Indicates that the concierge successfully launched crosvm as its child
+  // process. If you want guest userland state use VmGuestUserlandReadySignal.
   void SendVmStartedSignalSignal(
       const vm_tools::concierge::VmStartedSignal& in_signal) {
     auto signal = signal_VmStartedSignal_.lock();
@@ -294,12 +299,14 @@ class VmConciergeAdaptor {
     if (signal)
       signal->Send(in_signal);
   }
+  // Indicates VM is stopped.
   void SendVmStoppedSignalSignal(
       const vm_tools::concierge::VmStoppedSignal& in_signal) {
     auto signal = signal_VmStoppedSignal_.lock();
     if (signal)
       signal->Send(in_signal);
   }
+  // Indicates VM is stopping.
   void SendVmStoppingSignalSignal(
       const vm_tools::concierge::VmStoppingSignal& in_signal) {
     auto signal = signal_VmStoppingSignal_.lock();
