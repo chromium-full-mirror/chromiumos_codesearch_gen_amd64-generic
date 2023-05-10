@@ -29,6 +29,11 @@ class VmConciergeInterface {
   // Adjusts parameters of a given VM.
   virtual vm_tools::concierge::AdjustVmResponse AdjustVm(
       const vm_tools::concierge::AdjustVmRequest& in_request) = 0;
+  // Inflate balloon in a vm until perceptible processes in the guest are
+  // tried to kill.
+  virtual void AggressiveBalloon(
+      std::unique_ptr<brillo::dbus_utils::DBusMethodResponse<vm_tools::concierge::AggressiveBalloonResponse>> response,
+      const vm_tools::concierge::AggressiveBalloonRequest& in_request) = 0;
   // Completes the boot of an ARCVM VM.
   virtual vm_tools::concierge::ArcVmCompleteBootResponse ArcVmCompleteBoot(
       const vm_tools::concierge::ArcVmCompleteBootRequest& in_request) = 0;
@@ -94,11 +99,6 @@ class VmConciergeInterface {
   // Lists Vms.
   virtual vm_tools::concierge::ListVmsResponse ListVms(
       const vm_tools::concierge::ListVmsRequest& in_request) = 0;
-  // Inflate balloon in a vm until perceptible processes in the guest are
-  // tried to kill.
-  virtual void AggressiveBalloon(
-      std::unique_ptr<brillo::dbus_utils::DBusMethodResponse<vm_tools::concierge::AggressiveBalloonResponse>> response,
-      const vm_tools::concierge::AggressiveBalloonRequest& in_request) = 0;
   // Resizes a disk image. Can return asynchronously.
   virtual vm_tools::concierge::ResizeDiskImageResponse ResizeDiskImage(
       const vm_tools::concierge::ResizeDiskImageRequest& in_request) = 0;
@@ -145,6 +145,10 @@ class VmConciergeAdaptor {
         "AdjustVm",
         base::Unretained(interface_),
         &VmConciergeInterface::AdjustVm);
+    itf->AddMethodHandler(
+        "AggressiveBalloon",
+        base::Unretained(interface_),
+        &VmConciergeInterface::AggressiveBalloon);
     itf->AddSimpleMethodHandler(
         "ArcVmCompleteBoot",
         base::Unretained(interface_),
@@ -221,10 +225,6 @@ class VmConciergeAdaptor {
         "ListVms",
         base::Unretained(interface_),
         &VmConciergeInterface::ListVms);
-    itf->AddMethodHandler(
-        "AggressiveBalloon",
-        base::Unretained(interface_),
-        &VmConciergeInterface::AggressiveBalloon);
     itf->AddSimpleMethodHandler(
         "ResizeDiskImage",
         base::Unretained(interface_),
@@ -264,6 +264,7 @@ class VmConciergeAdaptor {
 
     signal_DiskImageProgress_ = itf->RegisterSignalOfType<SignalDiskImageProgressType>("DiskImageProgress");
     signal_VmGuestUserlandReadySignal_ = itf->RegisterSignalOfType<SignalVmGuestUserlandReadySignalType>("VmGuestUserlandReadySignal");
+    signal_DnsSettingsChanged_ = itf->RegisterSignalOfType<SignalDnsSettingsChangedType>("DnsSettingsChanged");
     signal_VmStartedSignal_ = itf->RegisterSignalOfType<SignalVmStartedSignalType>("VmStartedSignal");
     signal_VmStartingUpSignal_ = itf->RegisterSignalOfType<SignalVmStartingUpSignalType>("VmStartingUpSignal");
     signal_VmStoppedSignal_ = itf->RegisterSignalOfType<SignalVmStoppedSignalType>("VmStoppedSignal");
@@ -286,6 +287,13 @@ class VmConciergeAdaptor {
   void SendVmGuestUserlandReadySignalSignal(
       const vm_tools::concierge::VmGuestUserlandReadySignal& in_signal) {
     auto signal = signal_VmGuestUserlandReadySignal_.lock();
+    if (signal)
+      signal->Send(in_signal);
+  }
+  // Signal to let Parallels dispatcher aware of DNS settings change.
+  void SendDnsSettingsChangedSignal(
+      const vm_tools::concierge::DnsSettings& in_signal) {
+    auto signal = signal_DnsSettingsChanged_.lock();
     if (signal)
       signal->Send(in_signal);
   }
@@ -339,6 +347,10 @@ class VmConciergeAdaptor {
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "    </method>\n"
         "    <method name=\"AdjustVm\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"AggressiveBalloon\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
@@ -423,10 +435,6 @@ class VmConciergeAdaptor {
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
-        "    <method name=\"AggressiveBalloon\">\n"
-        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
-        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
-        "    </method>\n"
         "    <method name=\"ResizeDiskImage\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
@@ -466,6 +474,9 @@ class VmConciergeAdaptor {
         "    <signal name=\"VmGuestUserlandReadySignal\">\n"
         "      <arg name=\"signal\" type=\"ay\"/>\n"
         "    </signal>\n"
+        "    <signal name=\"DnsSettingsChanged\">\n"
+        "      <arg name=\"signal\" type=\"ay\"/>\n"
+        "    </signal>\n"
         "    <signal name=\"VmStartedSignal\">\n"
         "      <arg name=\"signal\" type=\"ay\"/>\n"
         "    </signal>\n"
@@ -492,6 +503,10 @@ class VmConciergeAdaptor {
   using SignalVmGuestUserlandReadySignalType = brillo::dbus_utils::DBusSignal<
       vm_tools::concierge::VmGuestUserlandReadySignal /*signal*/>;
   std::weak_ptr<SignalVmGuestUserlandReadySignalType> signal_VmGuestUserlandReadySignal_;
+
+  using SignalDnsSettingsChangedType = brillo::dbus_utils::DBusSignal<
+      vm_tools::concierge::DnsSettings /*signal*/>;
+  std::weak_ptr<SignalDnsSettingsChangedType> signal_DnsSettingsChanged_;
 
   using SignalVmStartedSignalType = brillo::dbus_utils::DBusSignal<
       vm_tools::concierge::VmStartedSignal /*signal*/>;
