@@ -66,7 +66,7 @@ class VmConciergeInterface {
   // Gets VM info specific to enterprise reporting.
   virtual vm_tools::concierge::GetVmEnterpriseReportingInfoResponse GetVmEnterpriseReportingInfo(
       const vm_tools::concierge::GetVmEnterpriseReportingInfoRequest& in_request) = 0;
-  // Gets VM's GPU cache path.
+  // Gets VM's GPU cache path. Returns dbus error on failure.
   virtual bool GetVmGpuCachePath(
       brillo::ErrorPtr* error,
       const vm_tools::concierge::GetVmGpuCachePathRequest& in_request,
@@ -99,6 +99,10 @@ class VmConciergeInterface {
   // Lists Vms.
   virtual vm_tools::concierge::ListVmsResponse ListVms(
       const vm_tools::concierge::ListVmsRequest& in_request) = 0;
+  // Requests to reclaim memory of a given VM.
+  virtual void ReclaimVmMemory(
+      std::unique_ptr<brillo::dbus_utils::DBusMethodResponse<vm_tools::concierge::ReclaimVmMemoryResponse>> response,
+      const vm_tools::concierge::ReclaimVmMemoryRequest& in_request) = 0;
   // Resizes a disk image. Can return asynchronously.
   virtual vm_tools::concierge::ResizeDiskImageResponse ResizeDiskImage(
       const vm_tools::concierge::ResizeDiskImageRequest& in_request) = 0;
@@ -225,6 +229,10 @@ class VmConciergeAdaptor {
         "ListVms",
         base::Unretained(interface_),
         &VmConciergeInterface::ListVms);
+    itf->AddMethodHandler(
+        "ReclaimVmMemory",
+        base::Unretained(interface_),
+        &VmConciergeInterface::ReclaimVmMemory);
     itf->AddSimpleMethodHandler(
         "ResizeDiskImage",
         base::Unretained(interface_),
@@ -432,6 +440,10 @@ class VmConciergeAdaptor {
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"ListVms\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"ReclaimVmMemory\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
