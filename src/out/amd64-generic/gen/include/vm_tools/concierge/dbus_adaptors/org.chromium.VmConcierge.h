@@ -115,6 +115,18 @@ class VmConciergeInterface {
   // Set VM's CPU restriction state.
   virtual vm_tools::concierge::SetVmCpuRestrictionResponse SetVmCpuRestriction(
       const vm_tools::concierge::SetVmCpuRestrictionRequest& in_request) = 0;
+  // Starts ARCVM VM.
+  virtual void StartArcVm(
+      std::unique_ptr<brillo::dbus_utils::DBusMethodResponse<vm_tools::concierge::StartVmResponse>> response,
+      const vm_tools::concierge::StartArcVmRequest& in_request) = 0;
+  // Starts Plugin VM.
+  virtual void StartPluginVm(
+      std::unique_ptr<brillo::dbus_utils::DBusMethodResponse<vm_tools::concierge::StartVmResponse>> response,
+      const vm_tools::concierge::StartPluginVmRequest& in_request) = 0;
+  // Starts VM.
+  virtual void StartVm(
+      dbus::MethodCall* method_call,
+      brillo::dbus_utils::ResponseSender sender) = 0;
   // Stops VM.
   virtual vm_tools::concierge::StopVmResponse StopVm(
       const vm_tools::concierge::StopVmRequest& in_request) = 0;
@@ -249,6 +261,18 @@ class VmConciergeAdaptor {
         "SetVmCpuRestriction",
         base::Unretained(interface_),
         &VmConciergeInterface::SetVmCpuRestriction);
+    itf->AddMethodHandler(
+        "StartArcVm",
+        base::Unretained(interface_),
+        &VmConciergeInterface::StartArcVm);
+    itf->AddMethodHandler(
+        "StartPluginVm",
+        base::Unretained(interface_),
+        &VmConciergeInterface::StartPluginVm);
+    itf->AddRawMethodHandler(
+        "StartVm",
+        base::Unretained(interface_),
+        &VmConciergeInterface::StartVm);
     itf->AddSimpleMethodHandler(
         "StopVm",
         base::Unretained(interface_),
@@ -462,6 +486,16 @@ class VmConciergeAdaptor {
         "    <method name=\"SetVmCpuRestriction\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"StartArcVm\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"StartPluginVm\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"StartVm\">\n"
         "    </method>\n"
         "    <method name=\"StopVm\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
