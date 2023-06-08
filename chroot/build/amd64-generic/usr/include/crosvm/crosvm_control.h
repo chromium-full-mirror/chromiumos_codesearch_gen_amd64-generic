@@ -14,6 +14,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define VIRTIO_BALLOON_WS_MAX_NUM_BINS 16
+
+#define VIRTIO_BALLOON_WS_MAX_NUM_INTERVALS 15
+
 /**
  * Current state of vmm-swap.
  *
@@ -50,6 +54,8 @@ typedef enum SwapState {
    */
   SWAP_IN_IN_PROGRESS = 6,
 } SwapState;
+
+typedef struct BalloonWssConfigFfi BalloonWssConfigFfi;
 
 /**
  * Current metrics of vmm-swap.
@@ -177,7 +183,9 @@ typedef struct WSSBucketFfi {
 } WSSBucketFfi;
 
 typedef struct BalloonWSSFfi {
-  struct WSSBucketFfi wss[4];
+  struct WSSBucketFfi wss[VIRTIO_BALLOON_WS_MAX_NUM_BINS];
+  uint8_t num_bins;
+  uint8_t _reserved[7];
 } BalloonWSSFfi;
 
 /**
@@ -528,7 +536,8 @@ bool crosvm_client_unregister_listener(const char *socket_path, const char *list
  * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
  * null pointers are passed.
  */
-bool crosvm_client_balloon_wss_config(const char *socket_path, const uint64_t (*config)[5]);
+bool crosvm_client_balloon_wss_config(const char *socket_path,
+                                      const struct BalloonWssConfigFfi *config);
 
 #ifdef __cplusplus
 } // extern "C"
