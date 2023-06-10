@@ -136,7 +136,8 @@ class VmConciergeInterface {
   virtual vm_tools::concierge::SuspendVmResponse SuspendVm(
       const vm_tools::concierge::SuspendVmRequest& in_request) = 0;
   // Handles a request to change VM swap state.
-  virtual vm_tools::concierge::SwapVmResponse SwapVm(
+  virtual void SwapVm(
+      std::unique_ptr<brillo::dbus_utils::DBusMethodResponse<vm_tools::concierge::SwapVmResponse>> response,
       const vm_tools::concierge::SwapVmRequest& in_request) = 0;
   // Updates all VMs' times to the current host time.
   virtual vm_tools::concierge::SyncVmTimesResponse SyncVmTimes() = 0;
@@ -285,7 +286,7 @@ class VmConciergeAdaptor {
         "SuspendVm",
         base::Unretained(interface_),
         &VmConciergeInterface::SuspendVm);
-    itf->AddSimpleMethodHandler(
+    itf->AddMethodHandler(
         "SwapVm",
         base::Unretained(interface_),
         &VmConciergeInterface::SwapVm);
