@@ -55,8 +55,6 @@ typedef enum SwapState {
   SWAP_IN_IN_PROGRESS = 6,
 } SwapState;
 
-typedef struct BalloonWssConfigFfi BalloonWssConfigFfi;
-
 /**
  * Current metrics of vmm-swap.
  *
@@ -195,6 +193,14 @@ typedef struct BalloonWSSFfi {
 typedef struct RegisteredEventFfi {
   uint32_t _0;
 } RegisteredEventFfi;
+
+typedef struct BalloonWssConfigFfi {
+  uint64_t intervals[VIRTIO_BALLOON_WS_MAX_NUM_INTERVALS];
+  uint8_t num_intervals;
+  uint8_t _reserved[7];
+  uint64_t refresh_threshold;
+  uint64_t report_threshold;
+} BalloonWssConfigFfi;
 
 #define REGISTERED_EVENT_VIRTIO_BALLOON_WSS_REPORT (RegisteredEventFfi){ ._0 = 0 }
 

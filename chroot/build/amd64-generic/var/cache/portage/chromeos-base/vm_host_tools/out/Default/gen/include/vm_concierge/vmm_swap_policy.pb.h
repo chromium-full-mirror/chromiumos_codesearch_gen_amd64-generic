@@ -49,10 +49,18 @@ namespace concierge {
 class TbwHistoryEntry;
 struct TbwHistoryEntryDefaultTypeInternal;
 extern TbwHistoryEntryDefaultTypeInternal _TbwHistoryEntry_default_instance_;
+class UsageHistoryEntry;
+struct UsageHistoryEntryDefaultTypeInternal;
+extern UsageHistoryEntryDefaultTypeInternal _UsageHistoryEntry_default_instance_;
+class UsageHistoryEntryContainer;
+struct UsageHistoryEntryContainerDefaultTypeInternal;
+extern UsageHistoryEntryContainerDefaultTypeInternal _UsageHistoryEntryContainer_default_instance_;
 }  // namespace concierge
 }  // namespace vm_tools
 PROTOBUF_NAMESPACE_OPEN
 template<> ::vm_tools::concierge::TbwHistoryEntry* Arena::CreateMaybeMessage<::vm_tools::concierge::TbwHistoryEntry>(Arena*);
+template<> ::vm_tools::concierge::UsageHistoryEntry* Arena::CreateMaybeMessage<::vm_tools::concierge::UsageHistoryEntry>(Arena*);
+template<> ::vm_tools::concierge::UsageHistoryEntryContainer* Arena::CreateMaybeMessage<::vm_tools::concierge::UsageHistoryEntryContainer>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace vm_tools {
 namespace concierge {
@@ -216,6 +224,333 @@ class TbwHistoryEntry final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_vmm_5fswap_5fpolicy_2eproto;
 };
+// -------------------------------------------------------------------
+
+class UsageHistoryEntry final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:vm_tools.concierge.UsageHistoryEntry) */ {
+ public:
+  inline UsageHistoryEntry() : UsageHistoryEntry(nullptr) {}
+  ~UsageHistoryEntry() override;
+  explicit PROTOBUF_CONSTEXPR UsageHistoryEntry(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  UsageHistoryEntry(const UsageHistoryEntry& from);
+  UsageHistoryEntry(UsageHistoryEntry&& from) noexcept
+    : UsageHistoryEntry() {
+    *this = ::std::move(from);
+  }
+
+  inline UsageHistoryEntry& operator=(const UsageHistoryEntry& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline UsageHistoryEntry& operator=(UsageHistoryEntry&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const UsageHistoryEntry& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const UsageHistoryEntry* internal_default_instance() {
+    return reinterpret_cast<const UsageHistoryEntry*>(
+               &_UsageHistoryEntry_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(UsageHistoryEntry& a, UsageHistoryEntry& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(UsageHistoryEntry* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(UsageHistoryEntry* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  UsageHistoryEntry* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<UsageHistoryEntry>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const UsageHistoryEntry& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const UsageHistoryEntry& from) {
+    UsageHistoryEntry::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(UsageHistoryEntry* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "vm_tools.concierge.UsageHistoryEntry";
+  }
+  protected:
+  explicit UsageHistoryEntry(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kStartTimeUsFieldNumber = 1,
+    kDurationUsFieldNumber = 2,
+    kIsShutdownFieldNumber = 3,
+  };
+  // int64 start_time_us = 1;
+  void clear_start_time_us();
+  int64_t start_time_us() const;
+  void set_start_time_us(int64_t value);
+  private:
+  int64_t _internal_start_time_us() const;
+  void _internal_set_start_time_us(int64_t value);
+  public:
+
+  // int64 duration_us = 2;
+  void clear_duration_us();
+  int64_t duration_us() const;
+  void set_duration_us(int64_t value);
+  private:
+  int64_t _internal_duration_us() const;
+  void _internal_set_duration_us(int64_t value);
+  public:
+
+  // bool is_shutdown = 3;
+  void clear_is_shutdown();
+  bool is_shutdown() const;
+  void set_is_shutdown(bool value);
+  private:
+  bool _internal_is_shutdown() const;
+  void _internal_set_is_shutdown(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:vm_tools.concierge.UsageHistoryEntry)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    int64_t start_time_us_;
+    int64_t duration_us_;
+    bool is_shutdown_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_vmm_5fswap_5fpolicy_2eproto;
+};
+// -------------------------------------------------------------------
+
+class UsageHistoryEntryContainer final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:vm_tools.concierge.UsageHistoryEntryContainer) */ {
+ public:
+  inline UsageHistoryEntryContainer() : UsageHistoryEntryContainer(nullptr) {}
+  ~UsageHistoryEntryContainer() override;
+  explicit PROTOBUF_CONSTEXPR UsageHistoryEntryContainer(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  UsageHistoryEntryContainer(const UsageHistoryEntryContainer& from);
+  UsageHistoryEntryContainer(UsageHistoryEntryContainer&& from) noexcept
+    : UsageHistoryEntryContainer() {
+    *this = ::std::move(from);
+  }
+
+  inline UsageHistoryEntryContainer& operator=(const UsageHistoryEntryContainer& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline UsageHistoryEntryContainer& operator=(UsageHistoryEntryContainer&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const UsageHistoryEntryContainer& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const UsageHistoryEntryContainer* internal_default_instance() {
+    return reinterpret_cast<const UsageHistoryEntryContainer*>(
+               &_UsageHistoryEntryContainer_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(UsageHistoryEntryContainer& a, UsageHistoryEntryContainer& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(UsageHistoryEntryContainer* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(UsageHistoryEntryContainer* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  UsageHistoryEntryContainer* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<UsageHistoryEntryContainer>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const UsageHistoryEntryContainer& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const UsageHistoryEntryContainer& from) {
+    UsageHistoryEntryContainer::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(UsageHistoryEntryContainer* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "vm_tools.concierge.UsageHistoryEntryContainer";
+  }
+  protected:
+  explicit UsageHistoryEntryContainer(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kEntriesFieldNumber = 1,
+  };
+  // repeated .vm_tools.concierge.UsageHistoryEntry entries = 1;
+  int entries_size() const;
+  private:
+  int _internal_entries_size() const;
+  public:
+  void clear_entries();
+  ::vm_tools::concierge::UsageHistoryEntry* mutable_entries(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::vm_tools::concierge::UsageHistoryEntry >*
+      mutable_entries();
+  private:
+  const ::vm_tools::concierge::UsageHistoryEntry& _internal_entries(int index) const;
+  ::vm_tools::concierge::UsageHistoryEntry* _internal_add_entries();
+  public:
+  const ::vm_tools::concierge::UsageHistoryEntry& entries(int index) const;
+  ::vm_tools::concierge::UsageHistoryEntry* add_entries();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::vm_tools::concierge::UsageHistoryEntry >&
+      entries() const;
+
+  // @@protoc_insertion_point(class_scope:vm_tools.concierge.UsageHistoryEntryContainer)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::vm_tools::concierge::UsageHistoryEntry > entries_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_vmm_5fswap_5fpolicy_2eproto;
+};
 // ===================================================================
 
 
@@ -267,9 +602,121 @@ inline void TbwHistoryEntry::set_size(uint64_t value) {
   // @@protoc_insertion_point(field_set:vm_tools.concierge.TbwHistoryEntry.size)
 }
 
+// -------------------------------------------------------------------
+
+// UsageHistoryEntry
+
+// int64 start_time_us = 1;
+inline void UsageHistoryEntry::clear_start_time_us() {
+  _impl_.start_time_us_ = int64_t{0};
+}
+inline int64_t UsageHistoryEntry::_internal_start_time_us() const {
+  return _impl_.start_time_us_;
+}
+inline int64_t UsageHistoryEntry::start_time_us() const {
+  // @@protoc_insertion_point(field_get:vm_tools.concierge.UsageHistoryEntry.start_time_us)
+  return _internal_start_time_us();
+}
+inline void UsageHistoryEntry::_internal_set_start_time_us(int64_t value) {
+  
+  _impl_.start_time_us_ = value;
+}
+inline void UsageHistoryEntry::set_start_time_us(int64_t value) {
+  _internal_set_start_time_us(value);
+  // @@protoc_insertion_point(field_set:vm_tools.concierge.UsageHistoryEntry.start_time_us)
+}
+
+// int64 duration_us = 2;
+inline void UsageHistoryEntry::clear_duration_us() {
+  _impl_.duration_us_ = int64_t{0};
+}
+inline int64_t UsageHistoryEntry::_internal_duration_us() const {
+  return _impl_.duration_us_;
+}
+inline int64_t UsageHistoryEntry::duration_us() const {
+  // @@protoc_insertion_point(field_get:vm_tools.concierge.UsageHistoryEntry.duration_us)
+  return _internal_duration_us();
+}
+inline void UsageHistoryEntry::_internal_set_duration_us(int64_t value) {
+  
+  _impl_.duration_us_ = value;
+}
+inline void UsageHistoryEntry::set_duration_us(int64_t value) {
+  _internal_set_duration_us(value);
+  // @@protoc_insertion_point(field_set:vm_tools.concierge.UsageHistoryEntry.duration_us)
+}
+
+// bool is_shutdown = 3;
+inline void UsageHistoryEntry::clear_is_shutdown() {
+  _impl_.is_shutdown_ = false;
+}
+inline bool UsageHistoryEntry::_internal_is_shutdown() const {
+  return _impl_.is_shutdown_;
+}
+inline bool UsageHistoryEntry::is_shutdown() const {
+  // @@protoc_insertion_point(field_get:vm_tools.concierge.UsageHistoryEntry.is_shutdown)
+  return _internal_is_shutdown();
+}
+inline void UsageHistoryEntry::_internal_set_is_shutdown(bool value) {
+  
+  _impl_.is_shutdown_ = value;
+}
+inline void UsageHistoryEntry::set_is_shutdown(bool value) {
+  _internal_set_is_shutdown(value);
+  // @@protoc_insertion_point(field_set:vm_tools.concierge.UsageHistoryEntry.is_shutdown)
+}
+
+// -------------------------------------------------------------------
+
+// UsageHistoryEntryContainer
+
+// repeated .vm_tools.concierge.UsageHistoryEntry entries = 1;
+inline int UsageHistoryEntryContainer::_internal_entries_size() const {
+  return _impl_.entries_.size();
+}
+inline int UsageHistoryEntryContainer::entries_size() const {
+  return _internal_entries_size();
+}
+inline void UsageHistoryEntryContainer::clear_entries() {
+  _impl_.entries_.Clear();
+}
+inline ::vm_tools::concierge::UsageHistoryEntry* UsageHistoryEntryContainer::mutable_entries(int index) {
+  // @@protoc_insertion_point(field_mutable:vm_tools.concierge.UsageHistoryEntryContainer.entries)
+  return _impl_.entries_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::vm_tools::concierge::UsageHistoryEntry >*
+UsageHistoryEntryContainer::mutable_entries() {
+  // @@protoc_insertion_point(field_mutable_list:vm_tools.concierge.UsageHistoryEntryContainer.entries)
+  return &_impl_.entries_;
+}
+inline const ::vm_tools::concierge::UsageHistoryEntry& UsageHistoryEntryContainer::_internal_entries(int index) const {
+  return _impl_.entries_.Get(index);
+}
+inline const ::vm_tools::concierge::UsageHistoryEntry& UsageHistoryEntryContainer::entries(int index) const {
+  // @@protoc_insertion_point(field_get:vm_tools.concierge.UsageHistoryEntryContainer.entries)
+  return _internal_entries(index);
+}
+inline ::vm_tools::concierge::UsageHistoryEntry* UsageHistoryEntryContainer::_internal_add_entries() {
+  return _impl_.entries_.Add();
+}
+inline ::vm_tools::concierge::UsageHistoryEntry* UsageHistoryEntryContainer::add_entries() {
+  ::vm_tools::concierge::UsageHistoryEntry* _add = _internal_add_entries();
+  // @@protoc_insertion_point(field_add:vm_tools.concierge.UsageHistoryEntryContainer.entries)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::vm_tools::concierge::UsageHistoryEntry >&
+UsageHistoryEntryContainer::entries() const {
+  // @@protoc_insertion_point(field_list:vm_tools.concierge.UsageHistoryEntryContainer.entries)
+  return _impl_.entries_;
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
