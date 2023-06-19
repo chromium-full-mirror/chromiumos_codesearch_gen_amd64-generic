@@ -337,6 +337,7 @@
 #define __NR_rseq 334
 #define __NR_io_uring_setup 425
 #define __NR_io_uring_enter 426
+#define __NR_pidfd_open 434
 #define __NR_close_range 436
 #define __NR_faccessat2 439
 
