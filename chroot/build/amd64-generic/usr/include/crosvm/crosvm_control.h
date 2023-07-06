@@ -56,6 +56,20 @@ typedef enum SwapState {
 } SwapState;
 
 /**
+ * Arguments structure for crosvm_client_swap_disable_vm2.
+ */
+typedef struct SwapDisableArgs {
+  /**
+   * The path of the control socket to target.
+   */
+  const char *socket_path;
+  /**
+   * Whether or not the swap file should be cleaned up in the background.
+   */
+  bool slow_file_cleanup;
+} SwapDisableArgs;
+
+/**
  * Current metrics of vmm-swap.
  *
  * This is only available while vmm-swap is enabled.
@@ -317,6 +331,19 @@ bool crosvm_client_swap_swapout_vm(const char *socket_path);
  * null pointers are passed.
  */
 bool crosvm_client_swap_disable_vm(const char *socket_path);
+
+/**
+ * Disable vmm swap according to `args`.
+ *
+ * The function returns true on success or false if an error occured.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
+ * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
+ * null pointers are passed.
+ */
+bool crosvm_client_swap_disable_vm2(struct SwapDisableArgs *args);
 
 /**
  * Trim staging memory for vmm swap for crosvm instance whose control socket is listening on
