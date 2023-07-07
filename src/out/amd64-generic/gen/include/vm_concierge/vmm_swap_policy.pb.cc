@@ -26,6 +26,7 @@ PROTOBUF_CONSTEXPR TbwHistoryEntry::TbwHistoryEntry(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.time_us_)*/int64_t{0}
   , /*decltype(_impl_.size_)*/uint64_t{0u}
+  , /*decltype(_impl_.reported_fence_)*/false
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct TbwHistoryEntryDefaultTypeInternal {
   PROTOBUF_CONSTEXPR TbwHistoryEntryDefaultTypeInternal()
@@ -36,6 +37,19 @@ struct TbwHistoryEntryDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 TbwHistoryEntryDefaultTypeInternal _TbwHistoryEntry_default_instance_;
+PROTOBUF_CONSTEXPR TbwHistoryEntryContainer::TbwHistoryEntryContainer(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.entries_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct TbwHistoryEntryContainerDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR TbwHistoryEntryContainerDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~TbwHistoryEntryContainerDefaultTypeInternal() {}
+  union {
+    TbwHistoryEntryContainer _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 TbwHistoryEntryContainerDefaultTypeInternal _TbwHistoryEntryContainer_default_instance_;
 PROTOBUF_CONSTEXPR UsageHistoryEntry::UsageHistoryEntry(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.start_time_us_)*/int64_t{0}
@@ -66,7 +80,7 @@ struct UsageHistoryEntryContainerDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 UsageHistoryEntryContainerDefaultTypeInternal _UsageHistoryEntryContainer_default_instance_;
 }  // namespace concierge
 }  // namespace vm_tools
-static ::_pb::Metadata file_level_metadata_vmm_5fswap_5fpolicy_2eproto[3];
+static ::_pb::Metadata file_level_metadata_vmm_5fswap_5fpolicy_2eproto[4];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_vmm_5fswap_5fpolicy_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_vmm_5fswap_5fpolicy_2eproto = nullptr;
 
@@ -79,6 +93,14 @@ const uint32_t TableStruct_vmm_5fswap_5fpolicy_2eproto::offsets[] PROTOBUF_SECTI
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::vm_tools::concierge::TbwHistoryEntry, _impl_.time_us_),
   PROTOBUF_FIELD_OFFSET(::vm_tools::concierge::TbwHistoryEntry, _impl_.size_),
+  PROTOBUF_FIELD_OFFSET(::vm_tools::concierge::TbwHistoryEntry, _impl_.reported_fence_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::vm_tools::concierge::TbwHistoryEntryContainer, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::vm_tools::concierge::TbwHistoryEntryContainer, _impl_.entries_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::vm_tools::concierge::UsageHistoryEntry, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -98,30 +120,35 @@ const uint32_t TableStruct_vmm_5fswap_5fpolicy_2eproto::offsets[] PROTOBUF_SECTI
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::vm_tools::concierge::TbwHistoryEntry)},
-  { 8, -1, -1, sizeof(::vm_tools::concierge::UsageHistoryEntry)},
-  { 17, -1, -1, sizeof(::vm_tools::concierge::UsageHistoryEntryContainer)},
+  { 9, -1, -1, sizeof(::vm_tools::concierge::TbwHistoryEntryContainer)},
+  { 16, -1, -1, sizeof(::vm_tools::concierge::UsageHistoryEntry)},
+  { 25, -1, -1, sizeof(::vm_tools::concierge::UsageHistoryEntryContainer)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
   &::vm_tools::concierge::_TbwHistoryEntry_default_instance_._instance,
+  &::vm_tools::concierge::_TbwHistoryEntryContainer_default_instance_._instance,
   &::vm_tools::concierge::_UsageHistoryEntry_default_instance_._instance,
   &::vm_tools::concierge::_UsageHistoryEntryContainer_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_vmm_5fswap_5fpolicy_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\025vmm_swap_policy.proto\022\022vm_tools.concie"
-  "rge\"0\n\017TbwHistoryEntry\022\017\n\007time_us\030\001 \001(\003\022"
-  "\014\n\004size\030\002 \001(\004\"T\n\021UsageHistoryEntry\022\025\n\rst"
-  "art_time_us\030\001 \001(\003\022\023\n\013duration_us\030\002 \001(\003\022\023"
-  "\n\013is_shutdown\030\003 \001(\010\"T\n\032UsageHistoryEntry"
-  "Container\0226\n\007entries\030\001 \003(\0132%.vm_tools.co"
-  "ncierge.UsageHistoryEntryB\003\370\001\001b\006proto3"
+  "rge\"H\n\017TbwHistoryEntry\022\017\n\007time_us\030\001 \001(\003\022"
+  "\014\n\004size\030\002 \001(\004\022\026\n\016reported_fence\030\003 \001(\010\"P\n"
+  "\030TbwHistoryEntryContainer\0224\n\007entries\030\001 \003"
+  "(\0132#.vm_tools.concierge.TbwHistoryEntry\""
+  "T\n\021UsageHistoryEntry\022\025\n\rstart_time_us\030\001 "
+  "\001(\003\022\023\n\013duration_us\030\002 \001(\003\022\023\n\013is_shutdown\030"
+  "\003 \001(\010\"T\n\032UsageHistoryEntryContainer\0226\n\007e"
+  "ntries\030\001 \003(\0132%.vm_tools.concierge.UsageH"
+  "istoryEntryB\003\370\001\001b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_vmm_5fswap_5fpolicy_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_vmm_5fswap_5fpolicy_2eproto = {
-    false, false, 278, descriptor_table_protodef_vmm_5fswap_5fpolicy_2eproto,
+    false, false, 384, descriptor_table_protodef_vmm_5fswap_5fpolicy_2eproto,
     "vmm_swap_policy.proto",
-    &descriptor_table_vmm_5fswap_5fpolicy_2eproto_once, nullptr, 0, 3,
+    &descriptor_table_vmm_5fswap_5fpolicy_2eproto_once, nullptr, 0, 4,
     schemas, file_default_instances, TableStruct_vmm_5fswap_5fpolicy_2eproto::offsets,
     file_level_metadata_vmm_5fswap_5fpolicy_2eproto, file_level_enum_descriptors_vmm_5fswap_5fpolicy_2eproto,
     file_level_service_descriptors_vmm_5fswap_5fpolicy_2eproto,
@@ -153,12 +180,13 @@ TbwHistoryEntry::TbwHistoryEntry(const TbwHistoryEntry& from)
   new (&_impl_) Impl_{
       decltype(_impl_.time_us_){}
     , decltype(_impl_.size_){}
+    , decltype(_impl_.reported_fence_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::memcpy(&_impl_.time_us_, &from._impl_.time_us_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.size_) -
-    reinterpret_cast<char*>(&_impl_.time_us_)) + sizeof(_impl_.size_));
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.reported_fence_) -
+    reinterpret_cast<char*>(&_impl_.time_us_)) + sizeof(_impl_.reported_fence_));
   // @@protoc_insertion_point(copy_constructor:vm_tools.concierge.TbwHistoryEntry)
 }
 
@@ -169,6 +197,7 @@ inline void TbwHistoryEntry::SharedCtor(
   new (&_impl_) Impl_{
       decltype(_impl_.time_us_){int64_t{0}}
     , decltype(_impl_.size_){uint64_t{0u}}
+    , decltype(_impl_.reported_fence_){false}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
@@ -197,8 +226,8 @@ void TbwHistoryEntry::Clear() {
   (void) cached_has_bits;
 
   ::memset(&_impl_.time_us_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.size_) -
-      reinterpret_cast<char*>(&_impl_.time_us_)) + sizeof(_impl_.size_));
+      reinterpret_cast<char*>(&_impl_.reported_fence_) -
+      reinterpret_cast<char*>(&_impl_.time_us_)) + sizeof(_impl_.reported_fence_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -220,6 +249,14 @@ const char* TbwHistoryEntry::_InternalParse(const char* ptr, ::_pbi::ParseContex
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _impl_.size_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bool reported_fence = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          _impl_.reported_fence_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -265,6 +302,12 @@ uint8_t* TbwHistoryEntry::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteUInt64ToArray(2, this->_internal_size(), target);
   }
 
+  // bool reported_fence = 3;
+  if (this->_internal_reported_fence() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(3, this->_internal_reported_fence(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -291,6 +334,11 @@ size_t TbwHistoryEntry::ByteSizeLong() const {
     total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_size());
   }
 
+  // bool reported_fence = 3;
+  if (this->_internal_reported_fence() != 0) {
+    total_size += 1 + 1;
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -315,6 +363,9 @@ void TbwHistoryEntry::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const 
   if (from._internal_size() != 0) {
     _this->_internal_set_size(from._internal_size());
   }
+  if (from._internal_reported_fence() != 0) {
+    _this->_internal_set_reported_fence(from._internal_reported_fence());
+  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -333,8 +384,8 @@ void TbwHistoryEntry::InternalSwap(TbwHistoryEntry* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(TbwHistoryEntry, _impl_.size_)
-      + sizeof(TbwHistoryEntry::_impl_.size_)
+      PROTOBUF_FIELD_OFFSET(TbwHistoryEntry, _impl_.reported_fence_)
+      + sizeof(TbwHistoryEntry::_impl_.reported_fence_)
       - PROTOBUF_FIELD_OFFSET(TbwHistoryEntry, _impl_.time_us_)>(
           reinterpret_cast<char*>(&_impl_.time_us_),
           reinterpret_cast<char*>(&other->_impl_.time_us_));
@@ -344,6 +395,191 @@ void TbwHistoryEntry::InternalSwap(TbwHistoryEntry* other) {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_vmm_5fswap_5fpolicy_2eproto_getter, &descriptor_table_vmm_5fswap_5fpolicy_2eproto_once,
       file_level_metadata_vmm_5fswap_5fpolicy_2eproto[0]);
+}
+
+// ===================================================================
+
+class TbwHistoryEntryContainer::_Internal {
+ public:
+};
+
+TbwHistoryEntryContainer::TbwHistoryEntryContainer(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:vm_tools.concierge.TbwHistoryEntryContainer)
+}
+TbwHistoryEntryContainer::TbwHistoryEntryContainer(const TbwHistoryEntryContainer& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  TbwHistoryEntryContainer* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.entries_){from._impl_.entries_}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:vm_tools.concierge.TbwHistoryEntryContainer)
+}
+
+inline void TbwHistoryEntryContainer::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.entries_){arena}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+}
+
+TbwHistoryEntryContainer::~TbwHistoryEntryContainer() {
+  // @@protoc_insertion_point(destructor:vm_tools.concierge.TbwHistoryEntryContainer)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void TbwHistoryEntryContainer::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.entries_.~RepeatedPtrField();
+}
+
+void TbwHistoryEntryContainer::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void TbwHistoryEntryContainer::Clear() {
+// @@protoc_insertion_point(message_clear_start:vm_tools.concierge.TbwHistoryEntryContainer)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.entries_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* TbwHistoryEntryContainer::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // repeated .vm_tools.concierge.TbwHistoryEntry entries = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_entries(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* TbwHistoryEntryContainer::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:vm_tools.concierge.TbwHistoryEntryContainer)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .vm_tools.concierge.TbwHistoryEntry entries = 1;
+  for (unsigned i = 0,
+      n = static_cast<unsigned>(this->_internal_entries_size()); i < n; i++) {
+    const auto& repfield = this->_internal_entries(i);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        InternalWriteMessage(1, repfield, repfield.GetCachedSize(), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:vm_tools.concierge.TbwHistoryEntryContainer)
+  return target;
+}
+
+size_t TbwHistoryEntryContainer::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:vm_tools.concierge.TbwHistoryEntryContainer)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .vm_tools.concierge.TbwHistoryEntry entries = 1;
+  total_size += 1UL * this->_internal_entries_size();
+  for (const auto& msg : this->_impl_.entries_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData TbwHistoryEntryContainer::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    TbwHistoryEntryContainer::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*TbwHistoryEntryContainer::GetClassData() const { return &_class_data_; }
+
+
+void TbwHistoryEntryContainer::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<TbwHistoryEntryContainer*>(&to_msg);
+  auto& from = static_cast<const TbwHistoryEntryContainer&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:vm_tools.concierge.TbwHistoryEntryContainer)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_impl_.entries_.MergeFrom(from._impl_.entries_);
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void TbwHistoryEntryContainer::CopyFrom(const TbwHistoryEntryContainer& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:vm_tools.concierge.TbwHistoryEntryContainer)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool TbwHistoryEntryContainer::IsInitialized() const {
+  return true;
+}
+
+void TbwHistoryEntryContainer::InternalSwap(TbwHistoryEntryContainer* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.entries_.InternalSwap(&other->_impl_.entries_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata TbwHistoryEntryContainer::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_vmm_5fswap_5fpolicy_2eproto_getter, &descriptor_table_vmm_5fswap_5fpolicy_2eproto_once,
+      file_level_metadata_vmm_5fswap_5fpolicy_2eproto[1]);
 }
 
 // ===================================================================
@@ -578,7 +814,7 @@ void UsageHistoryEntry::InternalSwap(UsageHistoryEntry* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata UsageHistoryEntry::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_vmm_5fswap_5fpolicy_2eproto_getter, &descriptor_table_vmm_5fswap_5fpolicy_2eproto_once,
-      file_level_metadata_vmm_5fswap_5fpolicy_2eproto[1]);
+      file_level_metadata_vmm_5fswap_5fpolicy_2eproto[2]);
 }
 
 // ===================================================================
@@ -763,7 +999,7 @@ void UsageHistoryEntryContainer::InternalSwap(UsageHistoryEntryContainer* other)
 ::PROTOBUF_NAMESPACE_ID::Metadata UsageHistoryEntryContainer::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_vmm_5fswap_5fpolicy_2eproto_getter, &descriptor_table_vmm_5fswap_5fpolicy_2eproto_once,
-      file_level_metadata_vmm_5fswap_5fpolicy_2eproto[2]);
+      file_level_metadata_vmm_5fswap_5fpolicy_2eproto[3]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
@@ -773,6 +1009,10 @@ PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::vm_tools::concierge::TbwHistoryEntry*
 Arena::CreateMaybeMessage< ::vm_tools::concierge::TbwHistoryEntry >(Arena* arena) {
   return Arena::CreateMessageInternal< ::vm_tools::concierge::TbwHistoryEntry >(arena);
+}
+template<> PROTOBUF_NOINLINE ::vm_tools::concierge::TbwHistoryEntryContainer*
+Arena::CreateMaybeMessage< ::vm_tools::concierge::TbwHistoryEntryContainer >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::vm_tools::concierge::TbwHistoryEntryContainer >(arena);
 }
 template<> PROTOBUF_NOINLINE ::vm_tools::concierge::UsageHistoryEntry*
 Arena::CreateMaybeMessage< ::vm_tools::concierge::UsageHistoryEntry >(Arena* arena) {

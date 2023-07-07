@@ -49,6 +49,9 @@ namespace concierge {
 class TbwHistoryEntry;
 struct TbwHistoryEntryDefaultTypeInternal;
 extern TbwHistoryEntryDefaultTypeInternal _TbwHistoryEntry_default_instance_;
+class TbwHistoryEntryContainer;
+struct TbwHistoryEntryContainerDefaultTypeInternal;
+extern TbwHistoryEntryContainerDefaultTypeInternal _TbwHistoryEntryContainer_default_instance_;
 class UsageHistoryEntry;
 struct UsageHistoryEntryDefaultTypeInternal;
 extern UsageHistoryEntryDefaultTypeInternal _UsageHistoryEntry_default_instance_;
@@ -59,6 +62,7 @@ extern UsageHistoryEntryContainerDefaultTypeInternal _UsageHistoryEntryContainer
 }  // namespace vm_tools
 PROTOBUF_NAMESPACE_OPEN
 template<> ::vm_tools::concierge::TbwHistoryEntry* Arena::CreateMaybeMessage<::vm_tools::concierge::TbwHistoryEntry>(Arena*);
+template<> ::vm_tools::concierge::TbwHistoryEntryContainer* Arena::CreateMaybeMessage<::vm_tools::concierge::TbwHistoryEntryContainer>(Arena*);
 template<> ::vm_tools::concierge::UsageHistoryEntry* Arena::CreateMaybeMessage<::vm_tools::concierge::UsageHistoryEntry>(Arena*);
 template<> ::vm_tools::concierge::UsageHistoryEntryContainer* Arena::CreateMaybeMessage<::vm_tools::concierge::UsageHistoryEntryContainer>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -190,6 +194,7 @@ class TbwHistoryEntry final :
   enum : int {
     kTimeUsFieldNumber = 1,
     kSizeFieldNumber = 2,
+    kReportedFenceFieldNumber = 3,
   };
   // int64 time_us = 1;
   void clear_time_us();
@@ -209,6 +214,15 @@ class TbwHistoryEntry final :
   void _internal_set_size(uint64_t value);
   public:
 
+  // bool reported_fence = 3;
+  void clear_reported_fence();
+  bool reported_fence() const;
+  void set_reported_fence(bool value);
+  private:
+  bool _internal_reported_fence() const;
+  void _internal_set_reported_fence(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:vm_tools.concierge.TbwHistoryEntry)
  private:
   class _Internal;
@@ -219,6 +233,164 @@ class TbwHistoryEntry final :
   struct Impl_ {
     int64_t time_us_;
     uint64_t size_;
+    bool reported_fence_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_vmm_5fswap_5fpolicy_2eproto;
+};
+// -------------------------------------------------------------------
+
+class TbwHistoryEntryContainer final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:vm_tools.concierge.TbwHistoryEntryContainer) */ {
+ public:
+  inline TbwHistoryEntryContainer() : TbwHistoryEntryContainer(nullptr) {}
+  ~TbwHistoryEntryContainer() override;
+  explicit PROTOBUF_CONSTEXPR TbwHistoryEntryContainer(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  TbwHistoryEntryContainer(const TbwHistoryEntryContainer& from);
+  TbwHistoryEntryContainer(TbwHistoryEntryContainer&& from) noexcept
+    : TbwHistoryEntryContainer() {
+    *this = ::std::move(from);
+  }
+
+  inline TbwHistoryEntryContainer& operator=(const TbwHistoryEntryContainer& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline TbwHistoryEntryContainer& operator=(TbwHistoryEntryContainer&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const TbwHistoryEntryContainer& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const TbwHistoryEntryContainer* internal_default_instance() {
+    return reinterpret_cast<const TbwHistoryEntryContainer*>(
+               &_TbwHistoryEntryContainer_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(TbwHistoryEntryContainer& a, TbwHistoryEntryContainer& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(TbwHistoryEntryContainer* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(TbwHistoryEntryContainer* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  TbwHistoryEntryContainer* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<TbwHistoryEntryContainer>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const TbwHistoryEntryContainer& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const TbwHistoryEntryContainer& from) {
+    TbwHistoryEntryContainer::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(TbwHistoryEntryContainer* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "vm_tools.concierge.TbwHistoryEntryContainer";
+  }
+  protected:
+  explicit TbwHistoryEntryContainer(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kEntriesFieldNumber = 1,
+  };
+  // repeated .vm_tools.concierge.TbwHistoryEntry entries = 1;
+  int entries_size() const;
+  private:
+  int _internal_entries_size() const;
+  public:
+  void clear_entries();
+  ::vm_tools::concierge::TbwHistoryEntry* mutable_entries(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::vm_tools::concierge::TbwHistoryEntry >*
+      mutable_entries();
+  private:
+  const ::vm_tools::concierge::TbwHistoryEntry& _internal_entries(int index) const;
+  ::vm_tools::concierge::TbwHistoryEntry* _internal_add_entries();
+  public:
+  const ::vm_tools::concierge::TbwHistoryEntry& entries(int index) const;
+  ::vm_tools::concierge::TbwHistoryEntry* add_entries();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::vm_tools::concierge::TbwHistoryEntry >&
+      entries() const;
+
+  // @@protoc_insertion_point(class_scope:vm_tools.concierge.TbwHistoryEntryContainer)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::vm_tools::concierge::TbwHistoryEntry > entries_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -274,7 +446,7 @@ class UsageHistoryEntry final :
                &_UsageHistoryEntry_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   friend void swap(UsageHistoryEntry& a, UsageHistoryEntry& b) {
     a.Swap(&b);
@@ -444,7 +616,7 @@ class UsageHistoryEntryContainer final :
                &_UsageHistoryEntryContainer_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(UsageHistoryEntryContainer& a, UsageHistoryEntryContainer& b) {
     a.Swap(&b);
@@ -602,6 +774,70 @@ inline void TbwHistoryEntry::set_size(uint64_t value) {
   // @@protoc_insertion_point(field_set:vm_tools.concierge.TbwHistoryEntry.size)
 }
 
+// bool reported_fence = 3;
+inline void TbwHistoryEntry::clear_reported_fence() {
+  _impl_.reported_fence_ = false;
+}
+inline bool TbwHistoryEntry::_internal_reported_fence() const {
+  return _impl_.reported_fence_;
+}
+inline bool TbwHistoryEntry::reported_fence() const {
+  // @@protoc_insertion_point(field_get:vm_tools.concierge.TbwHistoryEntry.reported_fence)
+  return _internal_reported_fence();
+}
+inline void TbwHistoryEntry::_internal_set_reported_fence(bool value) {
+  
+  _impl_.reported_fence_ = value;
+}
+inline void TbwHistoryEntry::set_reported_fence(bool value) {
+  _internal_set_reported_fence(value);
+  // @@protoc_insertion_point(field_set:vm_tools.concierge.TbwHistoryEntry.reported_fence)
+}
+
+// -------------------------------------------------------------------
+
+// TbwHistoryEntryContainer
+
+// repeated .vm_tools.concierge.TbwHistoryEntry entries = 1;
+inline int TbwHistoryEntryContainer::_internal_entries_size() const {
+  return _impl_.entries_.size();
+}
+inline int TbwHistoryEntryContainer::entries_size() const {
+  return _internal_entries_size();
+}
+inline void TbwHistoryEntryContainer::clear_entries() {
+  _impl_.entries_.Clear();
+}
+inline ::vm_tools::concierge::TbwHistoryEntry* TbwHistoryEntryContainer::mutable_entries(int index) {
+  // @@protoc_insertion_point(field_mutable:vm_tools.concierge.TbwHistoryEntryContainer.entries)
+  return _impl_.entries_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::vm_tools::concierge::TbwHistoryEntry >*
+TbwHistoryEntryContainer::mutable_entries() {
+  // @@protoc_insertion_point(field_mutable_list:vm_tools.concierge.TbwHistoryEntryContainer.entries)
+  return &_impl_.entries_;
+}
+inline const ::vm_tools::concierge::TbwHistoryEntry& TbwHistoryEntryContainer::_internal_entries(int index) const {
+  return _impl_.entries_.Get(index);
+}
+inline const ::vm_tools::concierge::TbwHistoryEntry& TbwHistoryEntryContainer::entries(int index) const {
+  // @@protoc_insertion_point(field_get:vm_tools.concierge.TbwHistoryEntryContainer.entries)
+  return _internal_entries(index);
+}
+inline ::vm_tools::concierge::TbwHistoryEntry* TbwHistoryEntryContainer::_internal_add_entries() {
+  return _impl_.entries_.Add();
+}
+inline ::vm_tools::concierge::TbwHistoryEntry* TbwHistoryEntryContainer::add_entries() {
+  ::vm_tools::concierge::TbwHistoryEntry* _add = _internal_add_entries();
+  // @@protoc_insertion_point(field_add:vm_tools.concierge.TbwHistoryEntryContainer.entries)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::vm_tools::concierge::TbwHistoryEntry >&
+TbwHistoryEntryContainer::entries() const {
+  // @@protoc_insertion_point(field_list:vm_tools.concierge.TbwHistoryEntryContainer.entries)
+  return _impl_.entries_;
+}
+
 // -------------------------------------------------------------------
 
 // UsageHistoryEntry
@@ -713,6 +949,8 @@ UsageHistoryEntryContainer::entries() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
