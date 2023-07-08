@@ -320,7 +320,7 @@ bool crosvm_client_swap_enable_vm(const char *socket_path);
 bool crosvm_client_swap_swapout_vm(const char *socket_path);
 
 /**
- * Disable vmm swap for crosvm instance whose control socket is listening on `socket_path`.
+ * Disable vmm swap according to `args`.
  *
  * The function returns true on success or false if an error occured.
  *
@@ -330,7 +330,7 @@ bool crosvm_client_swap_swapout_vm(const char *socket_path);
  * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
  * null pointers are passed.
  */
-bool crosvm_client_swap_disable_vm(const char *socket_path);
+bool crosvm_client_swap_disable_vm(struct SwapDisableArgs *args);
 
 /**
  * Disable vmm swap according to `args`.
