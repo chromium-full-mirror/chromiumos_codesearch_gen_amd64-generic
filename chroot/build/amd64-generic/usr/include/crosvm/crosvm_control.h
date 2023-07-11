@@ -333,19 +333,6 @@ bool crosvm_client_swap_swapout_vm(const char *socket_path);
 bool crosvm_client_swap_disable_vm(struct SwapDisableArgs *args);
 
 /**
- * Disable vmm swap according to `args`.
- *
- * The function returns true on success or false if an error occured.
- *
- * # Safety
- *
- * Function is unsafe due to raw pointer usage - a null pointer could be passed in. Usage of
- * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
- * null pointers are passed.
- */
-bool crosvm_client_swap_disable_vm2(struct SwapDisableArgs *args);
-
-/**
  * Trim staging memory for vmm swap for crosvm instance whose control socket is listening on
  * `socket_path`.
  *
