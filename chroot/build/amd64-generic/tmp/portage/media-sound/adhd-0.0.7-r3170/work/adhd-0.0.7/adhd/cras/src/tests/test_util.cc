@@ -4,10 +4,10 @@
 
 #include "cras/src/tests/test_util.hh"
 
-#include <assert.h>
+#include "cras/base/check.h"
 
 const char* test_tmpdir() {
   const char* dir = getenv("TEST_TMPDIR");
-  assert(dir != nullptr);
+  CRAS_CHECK(dir != nullptr);
   return dir;
 }
