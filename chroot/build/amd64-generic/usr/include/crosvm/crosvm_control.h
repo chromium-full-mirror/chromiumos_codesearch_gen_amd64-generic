@@ -488,6 +488,14 @@ bool crosvm_client_balloon_stats(const char *socket_path,
                                  uint64_t *actual);
 
 /**
+ * See crosvm_client_balloon_stats.
+ */
+bool crosvm_client_balloon_stats_with_timeout(const char *socket_path,
+                                              uint64_t timeout_ms,
+                                              struct BalloonStatsFfi *stats,
+                                              uint64_t *actual);
+
+/**
  * Returns balloon working set size of the crosvm instance whose control socket is listening on socket_path.
  *
  * The function returns true on success or false if an error occured.
