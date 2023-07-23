@@ -2016,9 +2016,7 @@ PROTOBUF_CONSTEXPR ChromeDeviceSettingsProto::ChromeDeviceSettingsProto(
   , device_login_screen_geolocation_access_level_(nullptr)
   , device_login_screen_webhid_allow_devices_for_urls_(nullptr)
   , device_low_battery_sound_(nullptr)
-  , device_charging_sounds_(nullptr)
-  , device_authentication_url_blocklist_(nullptr)
-  , device_authentication_url_allowlist_(nullptr){}
+  , device_charging_sounds_(nullptr){}
 struct ChromeDeviceSettingsProtoDefaultTypeInternal {
   PROTOBUF_CONSTEXPR ChromeDeviceSettingsProtoDefaultTypeInternal()
       : _instance(::_pbi::ConstantInitialized{}) {}
@@ -35446,14 +35444,6 @@ class ChromeDeviceSettingsProto::_Internal {
   static void set_has_device_charging_sounds(HasBits* has_bits) {
     (*has_bits)[4] |= 262144u;
   }
-  static const ::enterprise_management::StringListPolicyProto& device_authentication_url_blocklist(const ChromeDeviceSettingsProto* msg);
-  static void set_has_device_authentication_url_blocklist(HasBits* has_bits) {
-    (*has_bits)[4] |= 524288u;
-  }
-  static const ::enterprise_management::StringListPolicyProto& device_authentication_url_allowlist(const ChromeDeviceSettingsProto* msg);
-  static void set_has_device_authentication_url_allowlist(HasBits* has_bits) {
-    (*has_bits)[4] |= 1048576u;
-  }
 };
 
 const ::enterprise_management::DevicePolicyRefreshRateProto&
@@ -36044,14 +36034,6 @@ const ::enterprise_management::DeviceChargingSoundsProto&
 ChromeDeviceSettingsProto::_Internal::device_charging_sounds(const ChromeDeviceSettingsProto* msg) {
   return *msg->device_charging_sounds_;
 }
-const ::enterprise_management::StringListPolicyProto&
-ChromeDeviceSettingsProto::_Internal::device_authentication_url_blocklist(const ChromeDeviceSettingsProto* msg) {
-  return *msg->device_authentication_url_blocklist_;
-}
-const ::enterprise_management::StringListPolicyProto&
-ChromeDeviceSettingsProto::_Internal::device_authentication_url_allowlist(const ChromeDeviceSettingsProto* msg) {
-  return *msg->device_authentication_url_allowlist_;
-}
 void ChromeDeviceSettingsProto::clear_device_login_screen_system_info_enforced() {
   if (device_login_screen_system_info_enforced_ != nullptr) device_login_screen_system_info_enforced_->Clear();
   _has_bits_[2] &= ~0x02000000u;
@@ -36111,14 +36093,6 @@ void ChromeDeviceSettingsProto::clear_device_printing_client_name_template() {
 void ChromeDeviceSettingsProto::clear_device_login_screen_webhid_allow_devices_for_urls() {
   if (device_login_screen_webhid_allow_devices_for_urls_ != nullptr) device_login_screen_webhid_allow_devices_for_urls_->Clear();
   _has_bits_[4] &= ~0x00010000u;
-}
-void ChromeDeviceSettingsProto::clear_device_authentication_url_blocklist() {
-  if (device_authentication_url_blocklist_ != nullptr) device_authentication_url_blocklist_->Clear();
-  _has_bits_[4] &= ~0x00080000u;
-}
-void ChromeDeviceSettingsProto::clear_device_authentication_url_allowlist() {
-  if (device_authentication_url_allowlist_ != nullptr) device_authentication_url_allowlist_->Clear();
-  _has_bits_[4] &= ~0x00100000u;
 }
 ChromeDeviceSettingsProto::ChromeDeviceSettingsProto(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
@@ -36865,24 +36839,14 @@ ChromeDeviceSettingsProto::ChromeDeviceSettingsProto(const ChromeDeviceSettingsP
   } else {
     device_charging_sounds_ = nullptr;
   }
-  if (from._internal_has_device_authentication_url_blocklist()) {
-    device_authentication_url_blocklist_ = new ::enterprise_management::StringListPolicyProto(*from.device_authentication_url_blocklist_);
-  } else {
-    device_authentication_url_blocklist_ = nullptr;
-  }
-  if (from._internal_has_device_authentication_url_allowlist()) {
-    device_authentication_url_allowlist_ = new ::enterprise_management::StringListPolicyProto(*from.device_authentication_url_allowlist_);
-  } else {
-    device_authentication_url_allowlist_ = nullptr;
-  }
   // @@protoc_insertion_point(copy_constructor:enterprise_management.ChromeDeviceSettingsProto)
 }
 
 inline void ChromeDeviceSettingsProto::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&device_policy_refresh_rate_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&device_authentication_url_allowlist_) -
-    reinterpret_cast<char*>(&device_policy_refresh_rate_)) + sizeof(device_authentication_url_allowlist_));
+    0, static_cast<size_t>(reinterpret_cast<char*>(&device_charging_sounds_) -
+    reinterpret_cast<char*>(&device_policy_refresh_rate_)) + sizeof(device_charging_sounds_));
 }
 
 ChromeDeviceSettingsProto::~ChromeDeviceSettingsProto() {
@@ -37043,8 +37007,6 @@ inline void ChromeDeviceSettingsProto::SharedDtor() {
   if (this != internal_default_instance()) delete device_login_screen_webhid_allow_devices_for_urls_;
   if (this != internal_default_instance()) delete device_low_battery_sound_;
   if (this != internal_default_instance()) delete device_charging_sounds_;
-  if (this != internal_default_instance()) delete device_authentication_url_blocklist_;
-  if (this != internal_default_instance()) delete device_authentication_url_allowlist_;
 }
 
 void ChromeDeviceSettingsProto::SetCachedSize(int size) const {
@@ -37674,7 +37636,7 @@ void ChromeDeviceSettingsProto::Clear() {
       device_login_screen_geolocation_access_level_->Clear();
     }
   }
-  if (cached_has_bits & 0x001f0000u) {
+  if (cached_has_bits & 0x00070000u) {
     if (cached_has_bits & 0x00010000u) {
       GOOGLE_DCHECK(device_login_screen_webhid_allow_devices_for_urls_ != nullptr);
       device_login_screen_webhid_allow_devices_for_urls_->Clear();
@@ -37686,14 +37648,6 @@ void ChromeDeviceSettingsProto::Clear() {
     if (cached_has_bits & 0x00040000u) {
       GOOGLE_DCHECK(device_charging_sounds_ != nullptr);
       device_charging_sounds_->Clear();
-    }
-    if (cached_has_bits & 0x00080000u) {
-      GOOGLE_DCHECK(device_authentication_url_blocklist_ != nullptr);
-      device_authentication_url_blocklist_->Clear();
-    }
-    if (cached_has_bits & 0x00100000u) {
-      GOOGLE_DCHECK(device_authentication_url_allowlist_ != nullptr);
-      device_authentication_url_allowlist_->Clear();
     }
   }
   _has_bits_.Clear();
@@ -38882,22 +38836,6 @@ const char* ChromeDeviceSettingsProto::_InternalParse(const char* ptr, ::_pbi::P
         } else
           goto handle_unusual;
         continue;
-      // optional .enterprise_management.StringListPolicyProto device_authentication_url_blocklist = 151;
-      case 151:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 186)) {
-          ptr = ctx->ParseMessage(_internal_mutable_device_authentication_url_blocklist(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .enterprise_management.StringListPolicyProto device_authentication_url_allowlist = 152;
-      case 152:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 194)) {
-          ptr = ctx->ParseMessage(_internal_mutable_device_authentication_url_allowlist(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -39959,20 +39897,6 @@ uint8_t* ChromeDeviceSettingsProto::_InternalSerialize(
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(150, _Internal::device_charging_sounds(this),
         _Internal::device_charging_sounds(this).GetCachedSize(), target, stream);
-  }
-
-  // optional .enterprise_management.StringListPolicyProto device_authentication_url_blocklist = 151;
-  if (cached_has_bits & 0x00080000u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(151, _Internal::device_authentication_url_blocklist(this),
-        _Internal::device_authentication_url_blocklist(this).GetCachedSize(), target, stream);
-  }
-
-  // optional .enterprise_management.StringListPolicyProto device_authentication_url_allowlist = 152;
-  if (cached_has_bits & 0x00100000u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(152, _Internal::device_authentication_url_allowlist(this),
-        _Internal::device_authentication_url_allowlist(this).GetCachedSize(), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -41040,7 +40964,7 @@ size_t ChromeDeviceSettingsProto::ByteSizeLong() const {
     }
 
   }
-  if (cached_has_bits & 0x001f0000u) {
+  if (cached_has_bits & 0x00070000u) {
     // optional .enterprise_management.StringPolicyProto device_login_screen_webhid_allow_devices_for_urls = 148;
     if (cached_has_bits & 0x00010000u) {
       total_size += 2 +
@@ -41060,20 +40984,6 @@ size_t ChromeDeviceSettingsProto::ByteSizeLong() const {
       total_size += 2 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
           *device_charging_sounds_);
-    }
-
-    // optional .enterprise_management.StringListPolicyProto device_authentication_url_blocklist = 151;
-    if (cached_has_bits & 0x00080000u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *device_authentication_url_blocklist_);
-    }
-
-    // optional .enterprise_management.StringListPolicyProto device_authentication_url_allowlist = 152;
-    if (cached_has_bits & 0x00100000u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *device_authentication_url_allowlist_);
     }
 
   }
@@ -41570,7 +41480,7 @@ void ChromeDeviceSettingsProto::MergeFrom(const ChromeDeviceSettingsProto& from)
       _internal_mutable_device_login_screen_geolocation_access_level()->::enterprise_management::DeviceLoginScreenGeolocationAccessLevelProto::MergeFrom(from._internal_device_login_screen_geolocation_access_level());
     }
   }
-  if (cached_has_bits & 0x001f0000u) {
+  if (cached_has_bits & 0x00070000u) {
     if (cached_has_bits & 0x00010000u) {
       _internal_mutable_device_login_screen_webhid_allow_devices_for_urls()->::enterprise_management::StringPolicyProto::MergeFrom(from._internal_device_login_screen_webhid_allow_devices_for_urls());
     }
@@ -41579,12 +41489,6 @@ void ChromeDeviceSettingsProto::MergeFrom(const ChromeDeviceSettingsProto& from)
     }
     if (cached_has_bits & 0x00040000u) {
       _internal_mutable_device_charging_sounds()->::enterprise_management::DeviceChargingSoundsProto::MergeFrom(from._internal_device_charging_sounds());
-    }
-    if (cached_has_bits & 0x00080000u) {
-      _internal_mutable_device_authentication_url_blocklist()->::enterprise_management::StringListPolicyProto::MergeFrom(from._internal_device_authentication_url_blocklist());
-    }
-    if (cached_has_bits & 0x00100000u) {
-      _internal_mutable_device_authentication_url_allowlist()->::enterprise_management::StringListPolicyProto::MergeFrom(from._internal_device_authentication_url_allowlist());
     }
   }
   _internal_metadata_.MergeFrom<std::string>(from._internal_metadata_);
@@ -41610,8 +41514,8 @@ void ChromeDeviceSettingsProto::InternalSwap(ChromeDeviceSettingsProto* other) {
   swap(_has_bits_[3], other->_has_bits_[3]);
   swap(_has_bits_[4], other->_has_bits_[4]);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(ChromeDeviceSettingsProto, device_authentication_url_allowlist_)
-      + sizeof(ChromeDeviceSettingsProto::device_authentication_url_allowlist_)
+      PROTOBUF_FIELD_OFFSET(ChromeDeviceSettingsProto, device_charging_sounds_)
+      + sizeof(ChromeDeviceSettingsProto::device_charging_sounds_)
       - PROTOBUF_FIELD_OFFSET(ChromeDeviceSettingsProto, device_policy_refresh_rate_)>(
           reinterpret_cast<char*>(&device_policy_refresh_rate_),
           reinterpret_cast<char*>(&other->device_policy_refresh_rate_));
