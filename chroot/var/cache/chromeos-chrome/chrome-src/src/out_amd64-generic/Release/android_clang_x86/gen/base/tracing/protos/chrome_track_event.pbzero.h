@@ -5048,7 +5048,7 @@ class ProcessSingleton : public ::protozero::Message {
   }
 };
 
-class EventLatency_Decoder : public ::protozero::TypedProtoDecoder</*MAX_FIELD_ID=*/4, /*HAS_NONPACKED_REPEATED_FIELDS=*/true> {
+class EventLatency_Decoder : public ::protozero::TypedProtoDecoder</*MAX_FIELD_ID=*/5, /*HAS_NONPACKED_REPEATED_FIELDS=*/true> {
  public:
   EventLatency_Decoder(const uint8_t* data, size_t len) : TypedProtoDecoder(data, len) {}
   explicit EventLatency_Decoder(const std::string& raw) : TypedProtoDecoder(reinterpret_cast<const uint8_t*>(raw.data()), raw.size()) {}
@@ -5061,6 +5061,8 @@ class EventLatency_Decoder : public ::protozero::TypedProtoDecoder</*MAX_FIELD_I
   ::protozero::RepeatedFieldIterator<::protozero::ConstChars> high_latency_stage() const { return GetRepeated<::protozero::ConstChars>(3); }
   bool has_event_latency_id() const { return at<4>().valid(); }
   int64_t event_latency_id() const { return at<4>().as_int64(); }
+  bool has_is_janky_scrolled_frame() const { return at<5>().valid(); }
+  bool is_janky_scrolled_frame() const { return at<5>().as_bool(); }
 };
 
 class EventLatency : public ::protozero::Message {
@@ -5071,6 +5073,7 @@ class EventLatency : public ::protozero::Message {
     kHasHighLatencyFieldNumber = 2,
     kHighLatencyStageFieldNumber = 3,
     kEventLatencyIdFieldNumber = 4,
+    kIsJankyScrolledFrameFieldNumber = 5,
   };
   static constexpr const char* GetName() { return ".perfetto.protos.EventLatency"; }
 
@@ -5183,6 +5186,24 @@ class EventLatency : public ::protozero::Message {
     // method based on the type of the field.
     ::protozero::internal::FieldWriter<
       ::protozero::proto_utils::ProtoSchemaType::kInt64>
+        ::Append(*this, field_id, value);
+  }
+
+  using FieldMetadata_IsJankyScrolledFrame =
+    ::protozero::proto_utils::FieldMetadata<
+      5,
+      ::protozero::proto_utils::RepetitionType::kNotRepeated,
+      ::protozero::proto_utils::ProtoSchemaType::kBool,
+      bool,
+      EventLatency>;
+
+  static constexpr FieldMetadata_IsJankyScrolledFrame kIsJankyScrolledFrame{};
+  void set_is_janky_scrolled_frame(bool value) {
+    static constexpr uint32_t field_id = FieldMetadata_IsJankyScrolledFrame::kFieldId;
+    // Call the appropriate protozero::Message::Append(field_id, ...)
+    // method based on the type of the field.
+    ::protozero::internal::FieldWriter<
+      ::protozero::proto_utils::ProtoSchemaType::kBool>
         ::Append(*this, field_id, value);
   }
 };
