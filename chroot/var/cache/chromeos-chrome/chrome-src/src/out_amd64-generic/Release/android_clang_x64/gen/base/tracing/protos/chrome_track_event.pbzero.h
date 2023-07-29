@@ -908,13 +908,14 @@ enum QueueName : int32_t {
   IO_USER_BLOCKING_DEFERRABLE_TQ = 53,
   UI_BEFORE_UNLOAD_BROWSER_RESPONSE_TQ = 54,
   IO_BEFORE_UNLOAD_BROWSER_RESPONSE_TQ = 55,
+  V8_LOW_PRIORITY_TQ = 56,
 };
 } // namespace perfetto_pbzero_enum_SequenceManagerTask
 using SequenceManagerTask_QueueName = perfetto_pbzero_enum_SequenceManagerTask::QueueName;
 
 
 constexpr SequenceManagerTask_QueueName SequenceManagerTask_QueueName_MIN = SequenceManagerTask_QueueName::UNKNOWN_TQ;
-constexpr SequenceManagerTask_QueueName SequenceManagerTask_QueueName_MAX = SequenceManagerTask_QueueName::IO_BEFORE_UNLOAD_BROWSER_RESPONSE_TQ;
+constexpr SequenceManagerTask_QueueName SequenceManagerTask_QueueName_MAX = SequenceManagerTask_QueueName::V8_LOW_PRIORITY_TQ;
 
 
 PERFETTO_PROTOZERO_CONSTEXPR14_OR_INLINE
@@ -1087,6 +1088,9 @@ const char* SequenceManagerTask_QueueName_Name(::perfetto::protos::pbzero::Seque
 
   case ::perfetto::protos::pbzero::SequenceManagerTask_QueueName::IO_BEFORE_UNLOAD_BROWSER_RESPONSE_TQ:
     return "IO_BEFORE_UNLOAD_BROWSER_RESPONSE_TQ";
+
+  case ::perfetto::protos::pbzero::SequenceManagerTask_QueueName::V8_LOW_PRIORITY_TQ:
+    return "V8_LOW_PRIORITY_TQ";
   }
   return "PBZERO_UNKNOWN_ENUM_VALUE";
 }
@@ -1418,13 +1422,14 @@ enum TaskType : int32_t {
   TASK_TYPE_LOW_PRIORITY_SCRIPT_EXECUTION = 81,
   TASK_TYPE_STORAGE = 82,
   TASK_TYPE_NETWORKING_UNFREEZABLE_IMAGE_LOADING = 83,
+  TASK_TYPE_MAIN_THREAD_TASK_QUEUE_V8_LOW_PRIORITY = 84,
 };
 } // namespace perfetto_pbzero_enum_RendererMainThreadTaskExecution
 using RendererMainThreadTaskExecution_TaskType = perfetto_pbzero_enum_RendererMainThreadTaskExecution::TaskType;
 
 
 constexpr RendererMainThreadTaskExecution_TaskType RendererMainThreadTaskExecution_TaskType_MIN = RendererMainThreadTaskExecution_TaskType::TASK_TYPE_UNKNOWN;
-constexpr RendererMainThreadTaskExecution_TaskType RendererMainThreadTaskExecution_TaskType_MAX = RendererMainThreadTaskExecution_TaskType::TASK_TYPE_NETWORKING_UNFREEZABLE_IMAGE_LOADING;
+constexpr RendererMainThreadTaskExecution_TaskType RendererMainThreadTaskExecution_TaskType_MAX = RendererMainThreadTaskExecution_TaskType::TASK_TYPE_MAIN_THREAD_TASK_QUEUE_V8_LOW_PRIORITY;
 
 
 PERFETTO_PROTOZERO_CONSTEXPR14_OR_INLINE
@@ -1651,6 +1656,9 @@ const char* RendererMainThreadTaskExecution_TaskType_Name(::perfetto::protos::pb
 
   case ::perfetto::protos::pbzero::RendererMainThreadTaskExecution_TaskType::TASK_TYPE_NETWORKING_UNFREEZABLE_IMAGE_LOADING:
     return "TASK_TYPE_NETWORKING_UNFREEZABLE_IMAGE_LOADING";
+
+  case ::perfetto::protos::pbzero::RendererMainThreadTaskExecution_TaskType::TASK_TYPE_MAIN_THREAD_TASK_QUEUE_V8_LOW_PRIORITY:
+    return "TASK_TYPE_MAIN_THREAD_TASK_QUEUE_V8_LOW_PRIORITY";
   }
   return "PBZERO_UNKNOWN_ENUM_VALUE";
 }
@@ -4717,6 +4725,7 @@ class SequenceManagerTask : public ::protozero::Message {
   static inline const QueueName IO_USER_BLOCKING_DEFERRABLE_TQ = QueueName::IO_USER_BLOCKING_DEFERRABLE_TQ;
   static inline const QueueName UI_BEFORE_UNLOAD_BROWSER_RESPONSE_TQ = QueueName::UI_BEFORE_UNLOAD_BROWSER_RESPONSE_TQ;
   static inline const QueueName IO_BEFORE_UNLOAD_BROWSER_RESPONSE_TQ = QueueName::IO_BEFORE_UNLOAD_BROWSER_RESPONSE_TQ;
+  static inline const QueueName V8_LOW_PRIORITY_TQ = QueueName::V8_LOW_PRIORITY_TQ;
 
   using FieldMetadata_Priority =
     ::protozero::proto_utils::FieldMetadata<
@@ -5291,6 +5300,7 @@ class RendererMainThreadTaskExecution : public ::protozero::Message {
   static inline const TaskType TASK_TYPE_LOW_PRIORITY_SCRIPT_EXECUTION = TaskType::TASK_TYPE_LOW_PRIORITY_SCRIPT_EXECUTION;
   static inline const TaskType TASK_TYPE_STORAGE = TaskType::TASK_TYPE_STORAGE;
   static inline const TaskType TASK_TYPE_NETWORKING_UNFREEZABLE_IMAGE_LOADING = TaskType::TASK_TYPE_NETWORKING_UNFREEZABLE_IMAGE_LOADING;
+  static inline const TaskType TASK_TYPE_MAIN_THREAD_TASK_QUEUE_V8_LOW_PRIORITY = TaskType::TASK_TYPE_MAIN_THREAD_TASK_QUEUE_V8_LOW_PRIORITY;
   static inline const FrameType FRAME_TYPE_UNSPECIFIED = FrameType::FRAME_TYPE_UNSPECIFIED;
   static inline const FrameType FRAME_TYPE_MAIN_FRAME = FrameType::FRAME_TYPE_MAIN_FRAME;
   static inline const FrameType FRAME_TYPE_SAME_ORIGIN_SUBFRAME = FrameType::FRAME_TYPE_SAME_ORIGIN_SUBFRAME;
