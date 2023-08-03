@@ -186,9 +186,6 @@ typedef struct BalloonStatsFfi {
   int64_t unevictable_memory;
 } BalloonStatsFfi;
 
-/**
- * Externally exposed variant of BalloonWss/WSSBucket, used for FFI.
- */
 typedef struct WSSBucketFfi {
   uint64_t age;
   uint64_t bytes[2];
@@ -199,6 +196,20 @@ typedef struct BalloonWSSFfi {
   uint8_t num_bins;
   uint8_t _reserved[7];
 } BalloonWSSFfi;
+
+/**
+ * Externally exposed variant of BalloonWS/WSBucket, used for FFI.
+ */
+typedef struct WorkingSetBucketFfi {
+  uint64_t age;
+  uint64_t bytes[2];
+} WorkingSetBucketFfi;
+
+typedef struct BalloonWSFfi {
+  struct WorkingSetBucketFfi ws[VIRTIO_BALLOON_WS_MAX_NUM_BINS];
+  uint8_t num_bins;
+  uint8_t _reserved[7];
+} BalloonWSFfi;
 
 /**
  * Publically exposed version of RegisteredEvent enum, implemented as an
@@ -216,7 +227,15 @@ typedef struct BalloonWssConfigFfi {
   uint64_t report_threshold;
 } BalloonWssConfigFfi;
 
-#define REGISTERED_EVENT_VIRTIO_BALLOON_WSS_REPORT (RegisteredEventFfi){ ._0 = 0 }
+typedef struct BalloonWSRConfigFfi {
+  uint64_t intervals[VIRTIO_BALLOON_WS_MAX_NUM_INTERVALS];
+  uint8_t num_intervals;
+  uint8_t _reserved[7];
+  uint64_t refresh_threshold;
+  uint64_t report_threshold;
+} BalloonWSRConfigFfi;
+
+#define REGISTERED_EVENT_VIRTIO_BALLOON_WS_REPORT (RegisteredEventFfi){ ._0 = 0 }
 
 #define REGISTERED_EVENT_VIRTIO_BALLOON_RESIZE (RegisteredEventFfi){ ._0 = 1 }
 
@@ -495,8 +514,12 @@ bool crosvm_client_balloon_stats_with_timeout(const char *socket_path,
                                               struct BalloonStatsFfi *stats,
                                               uint64_t *actual);
 
+bool crosvm_client_balloon_wss(const char *socket_path,
+                               struct BalloonWSSFfi *wss,
+                               uint64_t *actual);
+
 /**
- * Returns balloon working set size of the crosvm instance whose control socket is listening on socket_path.
+ * Returns balloon working set of the crosvm instance whose control socket is listening on socket_path.
  *
  * The function returns true on success or false if an error occured.
  *
@@ -506,9 +529,9 @@ bool crosvm_client_balloon_stats_with_timeout(const char *socket_path,
  * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
  * null pointers are passed.
  */
-bool crosvm_client_balloon_wss(const char *socket_path,
-                               struct BalloonWSSFfi *wss,
-                               uint64_t *actual);
+bool crosvm_client_balloon_working_set(const char *socket_path,
+                                       struct BalloonWSFfi *ws,
+                                       uint64_t *actual);
 
 /**
  * Registers the connected process as a listener for `event`.
@@ -553,8 +576,11 @@ bool crosvm_client_unregister_events_listener(const char *socket_path,
  */
 bool crosvm_client_unregister_listener(const char *socket_path, const char *listening_socket_path);
 
+bool crosvm_client_balloon_wss_config(const char *socket_path,
+                                      const struct BalloonWssConfigFfi *config);
+
 /**
- * Set Working Set Size config in guest.
+ * Set Working Set Reporting config in guest.
  *
  * The function returns true on success or false if an error occured.
  *
@@ -564,8 +590,8 @@ bool crosvm_client_unregister_listener(const char *socket_path, const char *list
  * !raw_pointer.is_null() checks should prevent unsafe behavior but the caller should ensure no
  * null pointers are passed.
  */
-bool crosvm_client_balloon_wss_config(const char *socket_path,
-                                      const struct BalloonWssConfigFfi *config);
+bool crosvm_client_balloon_wsr_config(const char *socket_path,
+                                      const struct BalloonWSRConfigFfi *config);
 
 #ifdef __cplusplus
 } // extern "C"
