@@ -186,17 +186,6 @@ typedef struct BalloonStatsFfi {
   int64_t unevictable_memory;
 } BalloonStatsFfi;
 
-typedef struct WSSBucketFfi {
-  uint64_t age;
-  uint64_t bytes[2];
-} WSSBucketFfi;
-
-typedef struct BalloonWSSFfi {
-  struct WSSBucketFfi wss[VIRTIO_BALLOON_WS_MAX_NUM_BINS];
-  uint8_t num_bins;
-  uint8_t _reserved[7];
-} BalloonWSSFfi;
-
 /**
  * Externally exposed variant of BalloonWS/WSBucket, used for FFI.
  */
@@ -218,14 +207,6 @@ typedef struct BalloonWSFfi {
 typedef struct RegisteredEventFfi {
   uint32_t _0;
 } RegisteredEventFfi;
-
-typedef struct BalloonWssConfigFfi {
-  uint64_t intervals[VIRTIO_BALLOON_WS_MAX_NUM_INTERVALS];
-  uint8_t num_intervals;
-  uint8_t _reserved[7];
-  uint64_t refresh_threshold;
-  uint64_t report_threshold;
-} BalloonWssConfigFfi;
 
 typedef struct BalloonWSRConfigFfi {
   uint64_t intervals[VIRTIO_BALLOON_WS_MAX_NUM_INTERVALS];
@@ -514,10 +495,6 @@ bool crosvm_client_balloon_stats_with_timeout(const char *socket_path,
                                               struct BalloonStatsFfi *stats,
                                               uint64_t *actual);
 
-bool crosvm_client_balloon_wss(const char *socket_path,
-                               struct BalloonWSSFfi *wss,
-                               uint64_t *actual);
-
 /**
  * Returns balloon working set of the crosvm instance whose control socket is listening on socket_path.
  *
@@ -575,9 +552,6 @@ bool crosvm_client_unregister_events_listener(const char *socket_path,
  * null pointers are passed.
  */
 bool crosvm_client_unregister_listener(const char *socket_path, const char *listening_socket_path);
-
-bool crosvm_client_balloon_wss_config(const char *socket_path,
-                                      const struct BalloonWssConfigFfi *config);
 
 /**
  * Set Working Set Reporting config in guest.
