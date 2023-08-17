@@ -293,6 +293,13 @@ bool crosvm_client_make_rt_vm(const char *socket_path);
 bool crosvm_client_balloon_vms(const char *socket_path, uint64_t num_bytes);
 
 /**
+ * See crosvm_client_balloon_vms.
+ */
+bool crosvm_client_balloon_vms_wait_with_timeout(const char *socket_path,
+                                                 uint64_t num_bytes,
+                                                 uint64_t timeout_ms);
+
+/**
  * Enable vmm swap for crosvm instance whose control socket is listening on `socket_path`.
  *
  * The function returns true on success or false if an error occured.
