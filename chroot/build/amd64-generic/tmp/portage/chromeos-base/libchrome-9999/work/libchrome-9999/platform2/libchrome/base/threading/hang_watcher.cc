@@ -164,6 +164,10 @@ BASE_FEATURE(kEnableHangWatcher,
              "EnableHangWatcher",
              FEATURE_ENABLED_BY_DEFAULT);
 
+BASE_FEATURE(kEnableHangWatcherInZygoteChildren,
+             "EnableHangWatcherInZygoteChildren",
+             FEATURE_ENABLED_BY_DEFAULT);
+
 // Browser process.
 constexpr base::FeatureParam<int> kIOThreadLogLevel{
     &kEnableHangWatcher, "io_thread_log_level",
@@ -318,13 +322,22 @@ WatchHangsInScope::~WatchHangsInScope() {
 }
 
 // static
-void HangWatcher::InitializeOnMainThread(ProcessType process_type) {
+void HangWatcher::InitializeOnMainThread(ProcessType process_type,
+                                         bool is_zygote_child) {
   DCHECK(!g_use_hang_watcher);
   DCHECK(g_io_thread_log_level == LoggingLevel::kNone);
   DCHECK(g_main_thread_log_level == LoggingLevel::kNone);
   DCHECK(g_threadpool_log_level == LoggingLevel::kNone);
 
   bool enable_hang_watcher = base::FeatureList::IsEnabled(kEnableHangWatcher);
+
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+  if (is_zygote_child) {
+    enable_hang_watcher =
+        enable_hang_watcher &&
+        base::FeatureList::IsEnabled(kEnableHangWatcherInZygoteChildren);
+  }
+#endif
 
   // Do not start HangWatcher in the GPU process until the issue related to
   // invalid magic signature in the GPU WatchDog is fixed
@@ -544,12 +557,14 @@ HangWatcher::~HangWatcher() {
 
 void HangWatcher::Start() {
   thread_.Start();
+  thread_started_ = true;
 }
 
 void HangWatcher::Stop() {
   g_keep_monitoring.store(false, std::memory_order_relaxed);
   should_monitor_.Signal();
   thread_.Join();
+  thread_started_ = false;
 
   // In production HangWatcher is always leaked but during testing it's possibly
   // stopped and restarted using a new instance. This makes sure the next call
@@ -747,8 +762,8 @@ void HangWatcher::WatchStateSnapShot::Init(
       if (ThreadTypeLoggingLevelGreaterOrEqual(watch_state.get()->thread_type(),
                                                LoggingLevel::kUmaOnly)) {
         const PlatformThreadId thread_id = watch_state.get()->GetThreadID();
-        const auto track = perfetto_libchrome::Track::FromPointer(
-            this, perfetto_libchrome::ThreadTrack::ForThread(thread_id));
+        const auto track = perfetto::Track::FromPointer(
+            this, perfetto::ThreadTrack::ForThread(thread_id));
         TRACE_EVENT_BEGIN("base", "HangWatcher::ThreadHung", track, deadline);
         TRACE_EVENT_END("base", track, now);
         // TODO(crbug.com/1021571): Remove this once fixed.

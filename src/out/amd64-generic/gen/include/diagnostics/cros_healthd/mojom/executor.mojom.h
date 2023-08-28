@@ -522,11 +522,9 @@ class Executor
     kReadFileMinVersion = 0,
     kReadFilePartMinVersion = 0,
     kGetFileInfoMinVersion = 0,
-    kGetFanSpeedMinVersion = 0,
+    kGetAllFanSpeedMinVersion = 0,
     kRunIwMinVersion = 0,
     kRunMemtesterMinVersion = 0,
-    kRunMemtesterV2MinVersion = 0,
-    kKillMemtesterMinVersion = 0,
     kGetProcessIOContentsMinVersion = 0,
     kReadMsrMinVersion = 0,
     kGetLidAngleMinVersion = 0,
@@ -567,19 +565,13 @@ class Executor
   struct GetFileInfo_Sym {
     NOINLINE static uint32_t IPCStableHash();
   };
-  struct GetFanSpeed_Sym {
+  struct GetAllFanSpeed_Sym {
     NOINLINE static uint32_t IPCStableHash();
   };
   struct RunIw_Sym {
     NOINLINE static uint32_t IPCStableHash();
   };
   struct RunMemtester_Sym {
-    NOINLINE static uint32_t IPCStableHash();
-  };
-  struct RunMemtesterV2_Sym {
-    NOINLINE static uint32_t IPCStableHash();
-  };
-  struct KillMemtester_Sym {
     NOINLINE static uint32_t IPCStableHash();
   };
   struct GetProcessIOContents_Sym {
@@ -683,25 +675,17 @@ class Executor
   virtual void GetFileInfo(Executor::File file_enum, GetFileInfoCallback callback) = 0;
 
 
-  using GetFanSpeedCallback = base::OnceCallback<void(ExecutedProcessResultPtr)>;
+  using GetAllFanSpeedCallback = base::OnceCallback<void(const std::vector<uint32_t>&, const absl::optional<std::string>&)>;
   
-  virtual void GetFanSpeed(GetFanSpeedCallback callback) = 0;
+  virtual void GetAllFanSpeed(GetAllFanSpeedCallback callback) = 0;
 
 
   using RunIwCallback = base::OnceCallback<void(ExecutedProcessResultPtr)>;
   
   virtual void RunIw(Executor::IwCommand cmd, const std::string& interface_name, RunIwCallback callback) = 0;
 
-
-  using RunMemtesterCallback = base::OnceCallback<void(ExecutedProcessResultPtr)>;
   
-  virtual void RunMemtester(uint32_t test_mem_kib, RunMemtesterCallback callback) = 0;
-
-  
-  virtual void RunMemtesterV2(uint32_t test_mem_kib, ::mojo::PendingReceiver<ProcessControl> receiver) = 0;
-
-  
-  virtual void KillMemtester() = 0;
+  virtual void RunMemtester(uint32_t test_mem_kib, ::mojo::PendingReceiver<ProcessControl> receiver) = 0;
 
 
   using GetProcessIOContentsCallback = base::OnceCallback<void(const base::flat_map<uint32_t, std::string>&)>;
@@ -971,15 +955,11 @@ class  ExecutorProxy
   
   void GetFileInfo(Executor::File file_enum, GetFileInfoCallback callback) final;
   
-  void GetFanSpeed(GetFanSpeedCallback callback) final;
+  void GetAllFanSpeed(GetAllFanSpeedCallback callback) final;
   
   void RunIw(Executor::IwCommand cmd, const std::string& interface_name, RunIwCallback callback) final;
   
-  void RunMemtester(uint32_t test_mem_kib, RunMemtesterCallback callback) final;
-  
-  void RunMemtesterV2(uint32_t test_mem_kib, ::mojo::PendingReceiver<ProcessControl> receiver) final;
-  
-  void KillMemtester() final;
+  void RunMemtester(uint32_t test_mem_kib, ::mojo::PendingReceiver<ProcessControl> receiver) final;
   
   void GetProcessIOContents(const std::vector<uint32_t>& pids, GetProcessIOContentsCallback callback) final;
   
@@ -1569,7 +1549,7 @@ class  ExecutedProcessResult {
   std::string err;
 
   // Serialise this struct into a trace.
-  void WriteIntoTrace(perfetto_libchrome::TracedValue traced_context) const;
+  void WriteIntoTrace(perfetto::TracedValue traced_context) const;
 
  private:
   static bool Validate(const void* data,
@@ -1710,7 +1690,7 @@ class  FingerprintInfoResult {
   bool rw_fw;
 
   // Serialise this struct into a trace.
-  void WriteIntoTrace(perfetto_libchrome::TracedValue traced_context) const;
+  void WriteIntoTrace(perfetto::TracedValue traced_context) const;
 
  private:
   static bool Validate(const void* data,
@@ -1853,7 +1833,7 @@ class  PrepareJobArgument {
   uint32_t file_size_mb;
 
   // Serialise this struct into a trace.
-  void WriteIntoTrace(perfetto_libchrome::TracedValue traced_context) const;
+  void WriteIntoTrace(perfetto::TracedValue traced_context) const;
 
  private:
   static bool Validate(const void* data,
@@ -2134,7 +2114,7 @@ class  FingerprintFrameResult {
   int32_t height;
 
   // Serialise this struct into a trace.
-  void WriteIntoTrace(perfetto_libchrome::TracedValue traced_context) const;
+  void WriteIntoTrace(perfetto::TracedValue traced_context) const;
 
  private:
   static bool Validate(const void* data,
@@ -2274,7 +2254,7 @@ class  FileInfo {
   base::Time creation_time;
 
   // Serialise this struct into a trace.
-  void WriteIntoTrace(perfetto_libchrome::TracedValue traced_context) const;
+  void WriteIntoTrace(perfetto::TracedValue traced_context) const;
 
  private:
   static bool Validate(const void* data,
@@ -2418,7 +2398,7 @@ class  ReadJobArgument {
   ::ash::cros_healthd::mojom::DiskReadTypeEnum disk_read_type;
 
   // Serialise this struct into a trace.
-  void WriteIntoTrace(perfetto_libchrome::TracedValue traced_context) const;
+  void WriteIntoTrace(perfetto::TracedValue traced_context) const;
 
  private:
   static bool Validate(const void* data,

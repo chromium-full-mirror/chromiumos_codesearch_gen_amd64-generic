@@ -33,22 +33,17 @@ class MockExecutor final : public ash::cros_healthd::mojom::Executor {
               (File, uint64_t, std::optional<uint64_t>, ReadFilePartCallback),
               (override));
   MOCK_METHOD(void, GetFileInfo, (File, GetFileInfoCallback), (override));
-  MOCK_METHOD(void, GetFanSpeed, (GetFanSpeedCallback), (override));
+  MOCK_METHOD(void, GetAllFanSpeed, (GetAllFanSpeedCallback), (override));
   MOCK_METHOD(void,
               RunIw,
               (IwCommand, const std::string&, RunIwCallback),
               (override));
   MOCK_METHOD(void,
               RunMemtester,
-              (uint32_t test_mem_kib, RunMemtesterCallback),
-              (override));
-  MOCK_METHOD(void,
-              RunMemtesterV2,
               (uint32_t test_mem_kib,
                mojo::PendingReceiver<ash::cros_healthd::mojom::ProcessControl>
                    receiver),
               (override));
-  MOCK_METHOD(void, KillMemtester, (), (override));
   MOCK_METHOD(void,
               GetProcessIOContents,
               (const std::vector<uint32_t>& pids, GetProcessIOContentsCallback),

@@ -330,21 +330,23 @@ void MissiveImpl::AsyncStartUploadInternal(
     return;
   }
   if (health_module_->is_debugging()) {
-    health_module_->GetHealthData(base::BindOnce(
-        [](base::WeakPtr<MissiveImpl> missive,
-           UploaderInterface::UploadReason reason,
-           UploaderInterface::UploaderInterfaceResultCb uploader_result_cb,
-           ERPHealthData health_data) {
-          if (!missive) {
-            std::move(uploader_result_cb)
-                .Run(Status(error::UNAVAILABLE,
-                            "Missive service has been shut down"));
-            return;
-          }
-          missive->CreateUploadJob(std::move(health_data), reason,
-                                   std::move(uploader_result_cb));
-        },
-        weak_ptr_factory_.GetWeakPtr(), reason, std::move(uploader_result_cb)));
+    health_module_->GetHealthData(
+        base::BindPostTaskToCurrentDefault(base::BindOnce(
+            [](base::WeakPtr<MissiveImpl> missive,
+               UploaderInterface::UploadReason reason,
+               UploaderInterface::UploaderInterfaceResultCb uploader_result_cb,
+               ERPHealthData health_data) {
+              if (!missive) {
+                std::move(uploader_result_cb)
+                    .Run(Status(error::UNAVAILABLE,
+                                "Missive service has been shut down"));
+                return;
+              }
+              missive->CreateUploadJob(std::move(health_data), reason,
+                                       std::move(uploader_result_cb));
+            },
+            weak_ptr_factory_.GetWeakPtr(), reason,
+            std::move(uploader_result_cb))));
   } else {
     CreateUploadJob(/*health_data=*/std::nullopt, reason,
                     std::move(uploader_result_cb));
@@ -355,6 +357,7 @@ void MissiveImpl::CreateUploadJob(
     std::optional<ERPHealthData> health_data,
     UploaderInterface::UploadReason reason,
     UploaderInterface::UploaderInterfaceResultCb uploader_result_cb) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   auto upload_job_result = UploadJob::Create(
       upload_client_,
       /*need_encryption_key=*/
@@ -451,6 +454,29 @@ void MissiveImpl::ConfirmRecordUpload(
 
   storage_module_->ReportSuccess(in_request.sequence_information(),
                                  in_request.force_confirm());
+  out_response->Return(response_body);
+}
+
+void MissiveImpl::UpdateConfigInMissive(
+    const UpdateConfigInMissiveRequest& in_request,
+    std::unique_ptr<
+        brillo::dbus_utils::DBusMethodResponse<UpdateConfigInMissiveResponse>>
+        out_response) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+  if (!is_enabled_) {
+    out_response->Return(
+        RespondMissiveDisabled<UpdateConfigInMissiveResponse>());
+    return;
+  }
+  UpdateConfigInMissiveResponse response_body;
+  if (!in_request.has_list_of_blocked_destinations()) {
+    auto status = response_body.mutable_status();
+    status->set_code(error::INVALID_ARGUMENT);
+    status->set_error_message("Request had no ListOfBlockedDestinations");
+    out_response->Return(response_body);
+    return;
+  }
+  // Do nothing in the mean time.
   out_response->Return(response_body);
 }
 

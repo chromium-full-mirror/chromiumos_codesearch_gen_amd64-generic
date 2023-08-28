@@ -43,6 +43,10 @@ class BRILLO_EXPORT FakeClient : public Client {
       uint64_t vm_id, int subnet_index) override;
   bool NotifyParallelsVmShutdown(uint64_t vm_id) override;
 
+  std::optional<Client::BruschettaAllocation> NotifyBruschettaVmStartup(
+      uint64_t vm_id) override;
+  bool NotifyBruschettaVmShutdown(uint64_t vm_id) override;
+
   bool DefaultVpnRouting(const base::ScopedFD& socket) override;
 
   bool RouteOnVpn(const base::ScopedFD& socket) override;
@@ -54,7 +58,8 @@ class BRILLO_EXPORT FakeClient : public Client {
       const std::string& outbound_ifname,
       bool forward_user_traffic,
       bool route_on_vpn,
-      Client::TrafficSource traffic_source) override;
+      Client::TrafficSource traffic_source,
+      bool static_ipv6) override;
 
   void GetTrafficCounters(const std::set<std::string>& devices,
                           Client::GetTrafficCountersCallback callback) override;

@@ -238,18 +238,6 @@ FakeCrosHealthdRoutineFactory::MakeAcPowerRoutine(
 }
 
 std::unique_ptr<DiagnosticRoutine>
-FakeCrosHealthdRoutineFactory::MakeCpuCacheRoutine(
-    const std::optional<base::TimeDelta>& exec_duration) {
-  return std::move(next_routine_);
-}
-
-std::unique_ptr<DiagnosticRoutine>
-FakeCrosHealthdRoutineFactory::MakeCpuStressRoutine(
-    const std::optional<base::TimeDelta>& exec_duration) {
-  return std::move(next_routine_);
-}
-
-std::unique_ptr<DiagnosticRoutine>
 FakeCrosHealthdRoutineFactory::MakeFloatingPointAccuracyRoutine(
     const std::optional<base::TimeDelta>& exec_duration) {
   return std::move(next_routine_);
@@ -272,12 +260,6 @@ FakeCrosHealthdRoutineFactory::MakeNvmeSelfTestRoutine(
 }
 
 std::unique_ptr<DiagnosticRoutine>
-FakeCrosHealthdRoutineFactory::MakePrimeSearchRoutine(
-    const std::optional<base::TimeDelta>& exec_duration) {
-  return std::move(next_routine_);
-}
-
-std::unique_ptr<DiagnosticRoutine>
 FakeCrosHealthdRoutineFactory::MakeBatteryDischargeRoutine(
     base::TimeDelta exec_duration, uint32_t maximum_discharge_percent_allowed) {
   return std::move(next_routine_);
@@ -286,11 +268,6 @@ FakeCrosHealthdRoutineFactory::MakeBatteryDischargeRoutine(
 std::unique_ptr<DiagnosticRoutine>
 FakeCrosHealthdRoutineFactory::MakeBatteryChargeRoutine(
     base::TimeDelta exec_duration, uint32_t minimum_charge_percent_required) {
-  return std::move(next_routine_);
-}
-
-std::unique_ptr<DiagnosticRoutine>
-FakeCrosHealthdRoutineFactory::MakeMemoryRoutine() {
   return std::move(next_routine_);
 }
 
