@@ -57,6 +57,10 @@ class VmConciergeInterface {
   // Checks status of a disk image operation.
   virtual vm_tools::concierge::DiskImageStatusResponse DiskImageStatus(
       const vm_tools::concierge::DiskImageStatusRequest& in_request) = 0;
+  // Enables the VM Memory Management service which allows for no-poll
+  // and responsive ballooning for client VMs.
+  virtual vm_tools::concierge::EnableVmMemoryManagementServiceResponse EnableVmMemoryManagementService(
+      const vm_tools::concierge::EnableVmMemoryManagementServiceRequest& in_request) = 0;
   // Exports a VM disk image.
   virtual void ExportDiskImage(
       dbus::MethodCall* method_call,
@@ -82,6 +86,11 @@ class VmConciergeInterface {
       brillo::ErrorPtr* error,
       const vm_tools::concierge::GetVmLogsRequest& in_request,
       vm_tools::concierge::GetVmLogsResponse* out_response) = 0;
+  // Returns an open FD to the VM Memory Management Service kills server.
+  virtual void GetVmMemoryManagementKillsConnection(
+      const vm_tools::concierge::GetVmMemoryManagementKillsConnectionRequest& in_request,
+      vm_tools::concierge::GetVmMemoryManagementKillsConnectionResponse* out_response,
+      base::ScopedFD* out_out_fd) = 0;
   // Imports a disk image.
   virtual vm_tools::concierge::ImportDiskImageResponse ImportDiskImage(
       const vm_tools::concierge::ImportDiskImageRequest& in_request,
@@ -194,6 +203,10 @@ class VmConciergeAdaptor {
         "DiskImageStatus",
         base::Unretained(interface_),
         &VmConciergeInterface::DiskImageStatus);
+    itf->AddSimpleMethodHandler(
+        "EnableVmMemoryManagementService",
+        base::Unretained(interface_),
+        &VmConciergeInterface::EnableVmMemoryManagementService);
     itf->AddRawMethodHandler(
         "ExportDiskImage",
         base::Unretained(interface_),
@@ -222,6 +235,10 @@ class VmConciergeAdaptor {
         "GetVmLogs",
         base::Unretained(interface_),
         &VmConciergeInterface::GetVmLogs);
+    itf->AddSimpleMethodHandler(
+        "GetVmMemoryManagementKillsConnection",
+        base::Unretained(interface_),
+        &VmConciergeInterface::GetVmMemoryManagementKillsConnection);
     itf->AddSimpleMethodHandler(
         "ImportDiskImage",
         base::Unretained(interface_),
@@ -414,6 +431,10 @@ class VmConciergeAdaptor {
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
         "    </method>\n"
+        "    <method name=\"EnableVmMemoryManagementService\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
         "    <method name=\"ExportDiskImage\">\n"
         "    </method>\n"
         "    <method name=\"GetDnsSettings\">\n"
@@ -438,6 +459,11 @@ class VmConciergeAdaptor {
         "    <method name=\"GetVmLogs\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "    </method>\n"
+        "    <method name=\"GetVmMemoryManagementKillsConnection\">\n"
+        "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
+        "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
+        "      <arg name=\"out_fd\" type=\"h\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"ImportDiskImage\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
