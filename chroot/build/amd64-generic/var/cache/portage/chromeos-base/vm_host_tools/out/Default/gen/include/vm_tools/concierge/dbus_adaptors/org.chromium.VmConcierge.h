@@ -49,7 +49,8 @@ class VmConciergeInterface {
       dbus::MethodCall* method_call,
       brillo::dbus_utils::ResponseSender sender) = 0;
   // Destroys a disk image.
-  virtual vm_tools::concierge::DestroyDiskImageResponse DestroyDiskImage(
+  virtual void DestroyDiskImage(
+      std::unique_ptr<brillo::dbus_utils::DBusMethodResponse<vm_tools::concierge::DestroyDiskImageResponse>> response,
       const vm_tools::concierge::DestroyDiskImageRequest& in_request) = 0;
   // Detaches a USB device from a VM.
   virtual vm_tools::concierge::DetachUsbDeviceResponse DetachUsbDevice(
@@ -137,10 +138,12 @@ class VmConciergeInterface {
       dbus::MethodCall* method_call,
       brillo::dbus_utils::ResponseSender sender) = 0;
   // Stops VM.
-  virtual vm_tools::concierge::StopVmResponse StopVm(
+  virtual void StopVm(
+      std::unique_ptr<brillo::dbus_utils::DBusMethodResponse<vm_tools::concierge::StopVmResponse>> response,
       const vm_tools::concierge::StopVmRequest& in_request) = 0;
   // Stops all running VMs.
-  virtual void StopAllVms() = 0;
+  virtual void StopAllVms(
+      std::unique_ptr<brillo::dbus_utils::DBusMethodResponse<>> response) = 0;
   // Suspends a VM.
   virtual vm_tools::concierge::SuspendVmResponse SuspendVm(
       const vm_tools::concierge::SuspendVmRequest& in_request) = 0;
@@ -191,7 +194,7 @@ class VmConciergeAdaptor {
         "CreateDiskImage",
         base::Unretained(interface_),
         &VmConciergeInterface::CreateDiskImage);
-    itf->AddSimpleMethodHandler(
+    itf->AddMethodHandler(
         "DestroyDiskImage",
         base::Unretained(interface_),
         &VmConciergeInterface::DestroyDiskImage);
@@ -291,11 +294,11 @@ class VmConciergeAdaptor {
         "StartVm",
         base::Unretained(interface_),
         &VmConciergeInterface::StartVm);
-    itf->AddSimpleMethodHandler(
+    itf->AddMethodHandler(
         "StopVm",
         base::Unretained(interface_),
         &VmConciergeInterface::StopVm);
-    itf->AddSimpleMethodHandler(
+    itf->AddMethodHandler(
         "StopAllVms",
         base::Unretained(interface_),
         &VmConciergeInterface::StopAllVms);
