@@ -28,7 +28,6 @@
 #include "diagnostics/cros_healthd/routines/fingerprint/fingerprint.h"
 #include "diagnostics/cros_healthd/routines/fingerprint/fingerprint_alive.h"
 #include "diagnostics/cros_healthd/routines/hardware_button/power_button.h"
-#include "diagnostics/cros_healthd/routines/memory_and_cpu/floating_point_accuracy.h"
 #include "diagnostics/cros_healthd/routines/memory_and_cpu/urandom.h"
 #include "diagnostics/cros_healthd/routines/network/captive_portal.h"
 #include "diagnostics/cros_healthd/routines/network/dns_latency.h"
@@ -54,7 +53,7 @@ namespace diagnostics {
 
 CrosHealthdRoutineFactoryImpl::CrosHealthdRoutineFactoryImpl(Context* context)
     : context_(context) {
-  DCHECK(context_);
+  CHECK(context_);
 
   parameter_fetcher_ =
       std::make_unique<RoutineParameterFetcher>(context_->cros_config());
@@ -93,7 +92,7 @@ std::unique_ptr<DiagnosticRoutine>
 CrosHealthdRoutineFactoryImpl::MakeSmartctlCheckRoutine(
     org::chromium::debugdProxyInterface* debugd_proxy,
     ash::cros_healthd::mojom::NullableUint32Ptr percentage_used_threshold) {
-  DCHECK(debugd_proxy);
+  CHECK(debugd_proxy);
   return std::make_unique<SmartctlCheckRoutine>(
       debugd_proxy,
       percentage_used_threshold.is_null()
@@ -109,16 +108,10 @@ CrosHealthdRoutineFactoryImpl::MakeAcPowerRoutine(
 }
 
 std::unique_ptr<DiagnosticRoutine>
-CrosHealthdRoutineFactoryImpl::MakeFloatingPointAccuracyRoutine(
-    const std::optional<base::TimeDelta>& exec_duration) {
-  return CreateFloatingPointAccuracyRoutine(exec_duration);
-}
-
-std::unique_ptr<DiagnosticRoutine>
 CrosHealthdRoutineFactoryImpl::MakeNvmeWearLevelRoutine(
     org::chromium::debugdProxyInterface* debugd_proxy,
     ash::cros_healthd::mojom::NullableUint32Ptr wear_level_threshold) {
-  DCHECK(debugd_proxy);
+  CHECK(debugd_proxy);
   std::optional<uint32_t> wear_level_threshold_ =
       !wear_level_threshold.is_null()
           ? wear_level_threshold->value
@@ -131,7 +124,7 @@ std::unique_ptr<DiagnosticRoutine>
 CrosHealthdRoutineFactoryImpl::MakeNvmeSelfTestRoutine(
     org::chromium::debugdProxyInterface* debugd_proxy,
     ash::cros_healthd::mojom::NvmeSelfTestTypeEnum nvme_self_test_type) {
-  DCHECK(debugd_proxy);
+  CHECK(debugd_proxy);
 
   NvmeSelfTestRoutine::SelfTestType type =
       nvme_self_test_type ==
@@ -262,7 +255,7 @@ CrosHealthdRoutineFactoryImpl::MakePrivacyScreenRoutine(bool target_state) {
 std::unique_ptr<DiagnosticRoutine>
 CrosHealthdRoutineFactoryImpl::MakeEmmcLifetimeRoutine(
     org::chromium::debugdProxyInterface* debugd_proxy) {
-  DCHECK(debugd_proxy);
+  CHECK(debugd_proxy);
   return std::make_unique<EmmcLifetimeRoutine>(debugd_proxy);
 }
 

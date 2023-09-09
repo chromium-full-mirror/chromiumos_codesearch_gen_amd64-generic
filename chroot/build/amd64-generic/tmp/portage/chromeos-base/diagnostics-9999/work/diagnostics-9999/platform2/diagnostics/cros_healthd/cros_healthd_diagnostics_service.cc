@@ -85,8 +85,9 @@ CrosHealthdDiagnosticsService::CrosHealthdDiagnosticsService(
     : context_(context),
       routine_factory_(routine_factory),
       routine_service_(routine_service) {
-  DCHECK(context_);
-  DCHECK(routine_factory_);
+  CHECK(context_);
+  CHECK(routine_factory_);
+  CHECK(routine_service_);
   ground_truth_ = std::make_unique<GroundTruth>(context_);
 
   // Service is ready after available routines are populated.
@@ -269,11 +270,15 @@ void CrosHealthdDiagnosticsService::RunFloatingPointAccuracyRoutine(
     mojom::NullableUint32Ptr length_seconds,
     RunFloatingPointAccuracyRoutineCallback callback) {
   std::optional<base::TimeDelta> exec_duration;
-  if (!length_seconds.is_null())
+  if (!length_seconds.is_null()) {
     exec_duration = base::Seconds(length_seconds->value);
-  RunRoutine(routine_factory_->MakeFloatingPointAccuracyRoutine(exec_duration),
-             mojom::DiagnosticRoutineEnum::kFloatingPointAccuracy,
-             std::move(callback));
+  }
+
+  auto args = mojom::RoutineArgument::NewFloatingPoint(
+      mojom::FloatingPointRoutineArgument::New(exec_duration));
+  RunRoutineWithAdapter(std::move(args),
+                        mojom::DiagnosticRoutineEnum::kFloatingPointAccuracy,
+                        std::move(callback));
 }
 
 void CrosHealthdDiagnosticsService::RunGatewayCanBePingedRoutine(

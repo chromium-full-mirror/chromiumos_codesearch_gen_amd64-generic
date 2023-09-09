@@ -313,6 +313,10 @@ class AuthSession final {
         const user_data_auth::RemoveAuthFactorRequest& request,
         StatusCallback on_done);
 
+    // Prepares an auth factor type for the add purpose.
+    void PrepareAuthFactorForAdd(AuthFactorType auth_factor_type,
+                                 StatusCallback on_done);
+
    private:
     // Special case for relabel of an ephemeral user's factor.
     void RelabelAuthFactorEphemeral(
@@ -435,7 +439,7 @@ class AuthSession final {
   // Adds AuthFactor to |auth_factor_map_|, registered as a VaultKeyset backed
   // factor. This functionality is only used by the cryptohome-test-tool and
   // through UserDataAuth::CreateVaultKeyset() for testing purposes.
-  void RegisterVaultKeysetAuthFactor(std::unique_ptr<AuthFactor> auth_factor);
+  void RegisterVaultKeysetAuthFactor(AuthFactor auth_factor);
 
  private:
   // Emits a debug log message with this Auth Session's initial state.
@@ -801,7 +805,7 @@ class AuthSession final {
   // Persists the updated USS and
   // re-creates the related credential verifier if applicable.
   void ResaveUssWithFactorUpdated(AuthFactorType auth_factor_type,
-                                  std::unique_ptr<AuthFactor> auth_factor,
+                                  AuthFactor auth_factor,
                                   const AuthInput& auth_input,
                                   std::unique_ptr<AuthSessionPerformanceTimer>
                                       auth_session_performance_timer,
@@ -852,7 +856,6 @@ class AuthSession final {
   // The repeating callback to send AuthFactorStatusUpdateSignal.
   AuthFactorStatusUpdateCallback auth_factor_status_update_callback_;
 
-  std::unique_ptr<AuthFactor> auth_factor_;
   // The decrypted UserSecretStash. Only populated for users who have it (legacy
   // users who only have vault keysets will have this field equal to null).
   std::unique_ptr<UserSecretStash> user_secret_stash_;

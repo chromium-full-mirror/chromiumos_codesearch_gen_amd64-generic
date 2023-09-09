@@ -132,7 +132,6 @@ constexpr char kFakeVkkKey[] = "fake_vkk_key";
 constexpr char kFakeSecondVkkKey[] = "fake_second_vkk_key";
 constexpr char kFakeRecordId[] = "fake_record_id";
 constexpr char kFakeSecondRecordId[] = "fake_second_record_id";
-constexpr char kFakeResetSecret[] = "fake_reset_secret";
 
 // Upper limit of the Size of user specified name.
 constexpr int kUserSpecifiedNameSizeLimit = 256;
@@ -217,8 +216,7 @@ class AfMapBuilder {
   // Helper to add copies of factors from an existing AuthFactorMap.
   AfMapBuilder& AddCopiesFromMap(const AuthFactorMap& af_map) {
     for (AuthFactorMap::ValueView entry : af_map) {
-      map_.Add(std::make_unique<AuthFactor>(entry.auth_factor()),
-               storage_type_);
+      map_.Add(entry.auth_factor(), storage_type_);
     }
     return *this;
   }
@@ -235,10 +233,9 @@ class AfMapBuilder {
     if constexpr (!std::is_void_v<StateType>) {
       auth_block_state.state = StateType();
     }
-    map_.Add(
-        std::make_unique<AuthFactor>(auth_factor_type, std::move(label),
-                                     AuthFactorMetadata(), auth_block_state),
-        storage_type_);
+    map_.Add(AuthFactor(auth_factor_type, std::move(label),
+                        AuthFactorMetadata(), auth_block_state),
+             storage_type_);
     return *this;
   }
 
@@ -1640,14 +1637,12 @@ TEST_F(AuthSessionTest, RemoveAuthFactorUpdatesAuthFactorMap) {
   AuthBlockState auth_block_state;
   auth_block_state.state = TpmBoundToPcrAuthBlockState();
   AuthFactorMap auth_factor_map;
-  auth_factor_map.Add(
-      std::make_unique<AuthFactor>(AuthFactorType::kPassword, kFakeLabel,
-                                   AuthFactorMetadata(), auth_block_state),
-      AuthFactorStorageType::kVaultKeyset);
-  auth_factor_map.Add(
-      std::make_unique<AuthFactor>(AuthFactorType::kPassword, kFakeOtherLabel,
-                                   AuthFactorMetadata(), auth_block_state),
-      AuthFactorStorageType::kVaultKeyset);
+  auth_factor_map.Add(AuthFactor(AuthFactorType::kPassword, kFakeLabel,
+                                 AuthFactorMetadata(), auth_block_state),
+                      AuthFactorStorageType::kVaultKeyset);
+  auth_factor_map.Add(AuthFactor(AuthFactorType::kPassword, kFakeOtherLabel,
+                                 AuthFactorMetadata(), auth_block_state),
+                      AuthFactorStorageType::kVaultKeyset);
 
   // Create AuthSession.
   auto no_uss = DisableUssExperiment();
@@ -2047,8 +2042,12 @@ class AuthSessionWithUssExperimentTest : public AuthSessionTest {
     return add_future.Get()->local_legacy_error().value();
   }
 
-  user_data_auth::CryptohomeErrorCode AddFirstFingerprintAuthFactor(
-      AuthSession& auth_session) {
+  user_data_auth::CryptohomeErrorCode AddFingerprintAuthFactor(
+      AuthSession& auth_session,
+      const std::string& label,
+      const brillo::SecureBlob& vkk_key,
+      const std::string& record_id,
+      uint64_t leaf_label) {
     EXPECT_CALL(auth_block_utility_, SelectAuthBlockTypeForCreation(_))
         .WillOnce(ReturnValue(AuthBlockType::kFingerprint));
     EXPECT_CALL(auth_block_utility_,
@@ -2056,20 +2055,18 @@ class AuthSessionWithUssExperimentTest : public AuthSessionTest {
         .WillOnce([&](AuthBlockType auth_block_type,
                       const AuthInput& auth_input,
                       AuthBlock::CreateCallback create_callback) {
-          // During the first create, rate-limiter should be empty.
-          EXPECT_FALSE(auth_input.rate_limiter_label.has_value());
-          EXPECT_FALSE(auth_input.reset_secret.has_value());
+          EXPECT_TRUE(auth_input.rate_limiter_label.has_value());
+          EXPECT_TRUE(auth_input.reset_secret.has_value());
           // Make an arbitrary auth block state type that can be used in the
           // tests.
           auto key_blobs = std::make_unique<KeyBlobs>();
-          key_blobs->vkk_key = brillo::SecureBlob(kFakeVkkKey);
-          key_blobs->rate_limiter_label = kFakeRateLimiterLabel;
-          key_blobs->reset_secret = brillo::SecureBlob(kFakeResetSecret);
+          key_blobs->vkk_key = vkk_key;
+          key_blobs->reset_secret = auth_input.reset_secret;
           auto auth_block_state = std::make_unique<AuthBlockState>();
           FingerprintAuthBlockState fingerprint_state =
               FingerprintAuthBlockState();
-          fingerprint_state.template_id = kFakeRecordId;
-          fingerprint_state.gsc_secret_label = kFakeFpLabel;
+          fingerprint_state.template_id = record_id;
+          fingerprint_state.gsc_secret_label = leaf_label;
           auth_block_state->state = fingerprint_state;
           std::move(create_callback)
               .Run(OkStatus<CryptohomeCryptoError>(), std::move(key_blobs),
@@ -2080,7 +2077,7 @@ class AuthSessionWithUssExperimentTest : public AuthSessionTest {
     request.set_auth_session_id(auth_session.serialized_token());
     request.mutable_auth_factor()->set_type(
         user_data_auth::AUTH_FACTOR_TYPE_FINGERPRINT);
-    request.mutable_auth_factor()->set_label(kFakeFingerprintLabel);
+    request.mutable_auth_factor()->set_label(label);
     request.mutable_auth_factor()->mutable_fingerprint_metadata();
     request.mutable_auth_input()->mutable_fingerprint_input();
 
@@ -2096,54 +2093,18 @@ class AuthSessionWithUssExperimentTest : public AuthSessionTest {
     return add_future.Get()->local_legacy_error().value();
   }
 
-  user_data_auth::CryptohomeErrorCode AddSubsequentFingerprintAuthFactor(
+  user_data_auth::CryptohomeErrorCode AddFirstFingerprintAuthFactor(
       AuthSession& auth_session) {
-    EXPECT_CALL(auth_block_utility_, SelectAuthBlockTypeForCreation(_))
-        .WillOnce(ReturnValue(AuthBlockType::kFingerprint));
-    EXPECT_CALL(auth_block_utility_,
-                CreateKeyBlobsWithAuthBlock(AuthBlockType::kFingerprint, _, _))
-        .WillOnce([&](AuthBlockType auth_block_type,
-                      const AuthInput& auth_input,
-                      AuthBlock::CreateCallback create_callback) {
-          // During the subsequent create, rate-limiter should already exist.
-          ASSERT_TRUE(auth_input.rate_limiter_label.has_value());
-          EXPECT_EQ(auth_input.rate_limiter_label.value(),
-                    kFakeRateLimiterLabel);
-          ASSERT_TRUE(auth_input.reset_secret.has_value());
-          EXPECT_EQ(auth_input.reset_secret.value(),
-                    brillo::SecureBlob(kFakeResetSecret));
-          // Make an arbitrary auth block state type that can be used in the
-          // tests.
-          auto key_blobs = std::make_unique<KeyBlobs>();
-          key_blobs->vkk_key = brillo::SecureBlob(kFakeSecondVkkKey);
-          auto auth_block_state = std::make_unique<AuthBlockState>();
-          FingerprintAuthBlockState fingerprint_state =
-              FingerprintAuthBlockState();
-          fingerprint_state.template_id = kFakeSecondRecordId;
-          fingerprint_state.gsc_secret_label = kFakeSecondFpLabel;
-          auth_block_state->state = fingerprint_state;
-          std::move(create_callback)
-              .Run(OkStatus<CryptohomeCryptoError>(), std::move(key_blobs),
-                   std::move(auth_block_state));
-        });
-    // Calling AddAuthFactor.
-    user_data_auth::AddAuthFactorRequest add_request;
-    add_request.set_auth_session_id(auth_session.serialized_token());
-    add_request.mutable_auth_factor()->set_type(
-        user_data_auth::AUTH_FACTOR_TYPE_FINGERPRINT);
-    add_request.mutable_auth_factor()->set_label(kFakeSecondFingerprintLabel);
-    add_request.mutable_auth_factor()->mutable_fingerprint_metadata();
-    add_request.mutable_auth_input()->mutable_fingerprint_input();
-    TestFuture<CryptohomeStatus> add_future;
-    auth_session.GetAuthForDecrypt()->AddAuthFactor(add_request,
-                                                    add_future.GetCallback());
+    return AddFingerprintAuthFactor(auth_session, kFakeFingerprintLabel,
+                                    brillo::SecureBlob(kFakeVkkKey),
+                                    kFakeRecordId, kFakeFpLabel);
+  }
 
-    if (add_future.Get().ok() ||
-        !add_future.Get()->local_legacy_error().has_value()) {
-      return user_data_auth::CRYPTOHOME_ERROR_NOT_SET;
-    }
-
-    return add_future.Get()->local_legacy_error().value();
+  user_data_auth::CryptohomeErrorCode AddSecondFingerprintAuthFactor(
+      AuthSession& auth_session) {
+    return AddFingerprintAuthFactor(auth_session, kFakeSecondFingerprintLabel,
+                                    brillo::SecureBlob(kFakeSecondVkkKey),
+                                    kFakeSecondRecordId, kFakeSecondFpLabel);
   }
 };
 
@@ -2556,12 +2517,12 @@ TEST_F(AuthSessionWithUssExperimentTest, AuthenticatePasswordAuthFactorViaUss) {
   ASSERT_TRUE(uss_main_key.has_value());
   // Creating the auth factor. An arbitrary auth block state is used in this
   // test.
-  auto auth_factor = std::make_unique<AuthFactor>(
+  AuthFactor auth_factor(
       AuthFactorType::kPassword, kFakeLabel,
       AuthFactorMetadata{.metadata = auth_factor::PasswordMetadata()},
       AuthBlockState{.state = TpmBoundToPcrAuthBlockState()});
   EXPECT_TRUE(
-      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, *auth_factor)
+      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, auth_factor)
           .ok());
   AuthFactorMap auth_factor_map;
   auth_factor_map.Add(std::move(auth_factor),
@@ -2656,12 +2617,12 @@ TEST_F(AuthSessionWithUssExperimentTest,
   ASSERT_TRUE(uss_main_key.has_value());
   // Creating the auth factor. An arbitrary auth block state is used in this
   // test.
-  auto auth_factor = std::make_unique<AuthFactor>(
+  AuthFactor auth_factor(
       AuthFactorType::kPassword, kFakeLabel,
       AuthFactorMetadata{.metadata = auth_factor::PasswordMetadata()},
       AuthBlockState{.state = TpmBoundToPcrAuthBlockState()});
   EXPECT_TRUE(
-      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, *auth_factor)
+      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, auth_factor)
           .ok());
   AuthFactorMap auth_factor_map;
   auth_factor_map.Add(std::move(auth_factor),
@@ -2757,12 +2718,12 @@ TEST_F(AuthSessionWithUssExperimentTest,
   ASSERT_TRUE(uss_main_key.has_value());
   // Creating the auth factor. An arbitrary auth block state is used in this
   // test.
-  auto auth_factor = std::make_unique<AuthFactor>(
+  AuthFactor auth_factor(
       AuthFactorType::kPassword, kFakeLabel,
       AuthFactorMetadata{.metadata = auth_factor::PasswordMetadata()},
       AuthBlockState{.state = TpmBoundToPcrAuthBlockState()});
   EXPECT_TRUE(
-      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, *auth_factor)
+      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, auth_factor)
           .ok());
   AuthFactorMap auth_factor_map;
   auth_factor_map.Add(std::move(auth_factor),
@@ -2855,12 +2816,12 @@ TEST_F(AuthSessionWithUssExperimentTest, AuthenticatePinAuthFactorViaUss) {
   ASSERT_TRUE(uss_main_key.has_value());
   // Creating the auth factor. An arbitrary auth block state is used in this
   // test.
-  auto auth_factor = std::make_unique<AuthFactor>(
+  AuthFactor auth_factor(
       AuthFactorType::kPin, kFakePinLabel,
       AuthFactorMetadata{.metadata = auth_factor::PinMetadata()},
       AuthBlockState{.state = PinWeaverAuthBlockState()});
   EXPECT_TRUE(
-      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, *auth_factor)
+      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, auth_factor)
           .ok());
   AuthFactorMap auth_factor_map;
   auth_factor_map.Add(std::move(auth_factor),
@@ -2950,12 +2911,12 @@ TEST_F(AuthSessionWithUssExperimentTest,
   ASSERT_TRUE(uss_main_key.has_value());
   // Creating the auth factor. An arbitrary auth block state is used in this
   // test.
-  auto auth_factor = std::make_unique<AuthFactor>(
+  AuthFactor auth_factor(
       AuthFactorType::kPin, kFakePinLabel,
       AuthFactorMetadata{.metadata = auth_factor::PinMetadata()},
       AuthBlockState{.state = PinWeaverAuthBlockState()});
   EXPECT_TRUE(
-      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, *auth_factor)
+      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, auth_factor)
           .ok());
   AuthFactorMap auth_factor_map;
   auth_factor_map.Add(std::move(auth_factor),
@@ -3062,12 +3023,12 @@ TEST_F(AuthSessionWithUssExperimentTest,
   ASSERT_TRUE(uss_main_key.has_value());
   // Creating the auth factor. An arbitrary auth block state is used in this
   // test.
-  auto auth_factor = std::make_unique<AuthFactor>(
+  AuthFactor auth_factor(
       AuthFactorType::kPin, kFakePinLabel,
       AuthFactorMetadata{.metadata = auth_factor::PinMetadata()},
       AuthBlockState{.state = PinWeaverAuthBlockState()});
   EXPECT_TRUE(
-      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, *auth_factor)
+      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, auth_factor)
           .ok());
   AuthFactorMap auth_factor_map;
   auth_factor_map.Add(std::move(auth_factor),
@@ -3165,12 +3126,12 @@ TEST_F(AuthSessionTest, AuthFactorStatusUpdateTimerTest) {
   ASSERT_TRUE(uss_main_key.has_value());
   // Creating the auth factor. An arbitrary auth block state is used in this
   // test.
-  auto auth_factor = std::make_unique<AuthFactor>(
+  AuthFactor auth_factor(
       AuthFactorType::kPin, kFakePinLabel,
       AuthFactorMetadata{.metadata = auth_factor::PinMetadata()},
       AuthBlockState{.state = PinWeaverAuthBlockState{.le_label = 0xbaadf00d}});
   EXPECT_TRUE(
-      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, *auth_factor)
+      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, auth_factor)
           .ok());
   AuthFactorMap auth_factor_map;
   auth_factor_map.Add(std::move(auth_factor),
@@ -3323,12 +3284,12 @@ TEST_F(AuthSessionWithUssExperimentTest,
       UserSecretStash::CreateRandomMainKey();
   ASSERT_TRUE(uss_main_key.has_value());
   // Creating the auth factor.
-  auto auth_factor = std::make_unique<AuthFactor>(
+  AuthFactor auth_factor(
       AuthFactorType::kCryptohomeRecovery, kFakeLabel,
       AuthFactorMetadata{.metadata = auth_factor::CryptohomeRecoveryMetadata()},
       AuthBlockState{.state = CryptohomeRecoveryAuthBlockState()});
   EXPECT_TRUE(
-      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, *auth_factor)
+      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, auth_factor)
           .ok());
   AuthFactorMap auth_factor_map;
   auth_factor_map.Add(std::move(auth_factor),
@@ -3462,18 +3423,17 @@ TEST_F(AuthSessionWithUssExperimentTest, AuthenticateSmartCardAuthFactor) {
       UserSecretStash::CreateRandomMainKey();
   ASSERT_TRUE(uss_main_key.has_value());
   // Creating the auth factor.
-  auto auth_factor = std::make_unique<AuthFactor>(
+  AuthFactor auth_factor(
       AuthFactorType::kSmartCard, kFakeLabel,
       AuthFactorMetadata{
           .metadata = auth_factor::SmartCardMetadata{.public_key_spki_der =
                                                          public_key_spki_der}},
       AuthBlockState{.state = ChallengeCredentialAuthBlockState()});
   EXPECT_TRUE(
-      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, *auth_factor)
+      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, auth_factor)
           .ok());
   AuthFactorMap auth_factor_map;
-  auth_factor_map.Add(std::make_unique<AuthFactor>(*auth_factor),
-                      AuthFactorStorageType::kUserSecretStash);
+  auth_factor_map.Add(auth_factor, AuthFactorStorageType::kUserSecretStash);
   // Adding the auth factor into the USS and persisting the latter.
   const KeyBlobs key_blobs = {.vkk_key = kFakePerCredentialSecret};
   std::optional<brillo::SecureBlob> wrapping_key =
@@ -3556,8 +3516,7 @@ TEST_F(AuthSessionWithUssExperimentTest, AuthenticateSmartCardAuthFactor) {
               UnorderedElementsAre(IsVerifierPtrWithLabel(kFakeLabel)));
 
   AuthFactorMap verify_auth_factor_map;
-  auth_factor_map.Add(std::make_unique<AuthFactor>(*auth_factor),
-                      AuthFactorStorageType::kUserSecretStash);
+  auth_factor_map.Add(auth_factor, AuthFactorStorageType::kUserSecretStash);
   AuthSession verify_auth_session(
       {.username = kFakeUsername,
        .is_ephemeral_user = false,
@@ -3646,12 +3605,12 @@ TEST_F(AuthSessionWithUssExperimentTest, LightweightPasswordPostAction) {
   ASSERT_TRUE(uss_main_key.has_value());
   // Creating the auth factor. An arbitrary auth block state is used in this
   // test.
-  auto auth_factor = std::make_unique<AuthFactor>(
+  AuthFactor auth_factor(
       AuthFactorType::kPassword, kFakeLabel,
       AuthFactorMetadata{.metadata = auth_factor::PasswordMetadata()},
       AuthBlockState{.state = TpmBoundToPcrAuthBlockState()});
   EXPECT_TRUE(
-      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, *auth_factor)
+      auth_factor_manager_.SaveAuthFactorFile(obfuscated_username, auth_factor)
           .ok());
   AuthFactorMap auth_factor_map;
   auth_factor_map.Add(std::move(auth_factor),
@@ -4745,12 +4704,11 @@ TEST_F(AuthSessionWithUssExperimentTest, UpdateAuthFactorMetadataSuccess) {
   auto loaded_auth_factor = auth_factor_manager_.LoadAuthFactor(
       SanitizeUserName(kFakeUsername), AuthFactorType::kPassword, kFakeLabel);
   EXPECT_THAT(loaded_auth_factor, IsOk());
-  EXPECT_EQ(loaded_auth_factor.value()->type(), AuthFactorType::kPassword);
-  EXPECT_EQ(loaded_auth_factor.value()->label(), kFakeLabel);
-  EXPECT_EQ(
-      loaded_auth_factor.value()->metadata().common.chrome_version_last_updated,
-      kFakeChromeVersion);
-  EXPECT_EQ(loaded_auth_factor.value()->metadata().common.user_specified_name,
+  EXPECT_EQ(loaded_auth_factor->type(), AuthFactorType::kPassword);
+  EXPECT_EQ(loaded_auth_factor->label(), kFakeLabel);
+  EXPECT_EQ(loaded_auth_factor->metadata().common.chrome_version_last_updated,
+            kFakeChromeVersion);
+  EXPECT_EQ(loaded_auth_factor->metadata().common.user_specified_name,
             kUserSpecifiedName);
 
   // Calling AuthenticateAuthFactor with the password succeeds.
@@ -4949,7 +4907,7 @@ TEST_F(AuthSessionWithUssExperimentTest, AuthenticatePasswordVkToKioskUss) {
   // Create a factor containing a password that will become a kiosk factor.
   AuthFactorMap auth_factor_map;
   auth_factor_map.Add(
-      std::make_unique<AuthFactor>(
+      AuthFactor(
           AuthFactorType::kPassword, kLegacyLabel,
           AuthFactorMetadata{.metadata = auth_factor::PasswordMetadata()},
           AuthBlockState()),
@@ -5034,39 +4992,11 @@ TEST_F(AuthSessionWithUssExperimentTest, AuthenticatePasswordVkToKioskUss) {
               VariantWith<auth_factor::KioskMetadata>(_));
 }
 
-// Test adding two fingerprint auth factors to the newly created user.
-// The first attempt should create a rate-limiter and the second should reuse
-// it.
-TEST_F(AuthSessionWithUssExperimentTest, AddFingerprint) {
-  // Setup.
-  AuthSession auth_session({.username = kFakeUsername,
-                            .is_ephemeral_user = false,
-                            .intent = AuthIntent::kDecrypt,
-                            .auth_factor_status_update_timer =
-                                std::make_unique<base::WallClockTimer>(),
-                            .user_exists = false,
-                            .auth_factor_map = AuthFactorMap()},
-                           backing_apis_);
-
-  // Creating the user.
-  EXPECT_TRUE(auth_session.OnUserCreated().ok());
-  EXPECT_TRUE(auth_session.has_user_secret_stash());
-  EXPECT_EQ(AddFirstFingerprintAuthFactor(auth_session),
-            user_data_auth::CRYPTOHOME_ERROR_NOT_SET);
-  EXPECT_EQ(AddSubsequentFingerprintAuthFactor(auth_session),
-            user_data_auth::CRYPTOHOME_ERROR_NOT_SET);
-  // Test and verify.
-  std::map<std::string, AuthFactorType> stored_factors =
-      auth_factor_manager_.ListAuthFactors(SanitizeUserName(kFakeUsername));
-  EXPECT_THAT(
-      stored_factors,
-      ElementsAre(
-          Pair(kFakeFingerprintLabel, AuthFactorType::kFingerprint),
-          Pair(kFakeSecondFingerprintLabel, AuthFactorType::kFingerprint)));
-}
-
 // Test that PrepareAuthFactor succeeds for fingerprint with the purpose of add.
 TEST_F(AuthSessionWithUssExperimentTest, PrepareFingerprintAdd) {
+  auto mock_le_manager = std::make_unique<MockLECredentialManager>();
+  MockLECredentialManager* mock_le_manager_ptr = mock_le_manager.get();
+  crypto_.set_le_manager_for_testing(std::move(mock_le_manager));
   // Create an AuthSession and add a mock for a successful auth block prepare.
   auto auth_session = std::make_unique<AuthSession>(
       AuthSession::Params{.username = kFakeUsername,
@@ -5074,23 +5004,55 @@ TEST_F(AuthSessionWithUssExperimentTest, PrepareFingerprintAdd) {
                           .intent = AuthIntent::kVerifyOnly,
                           .auth_factor_status_update_timer =
                               std::make_unique<base::WallClockTimer>(),
-                          .user_exists = true,
+                          .user_exists = false,
                           .auth_factor_map = AuthFactorMap()},
       backing_apis_);
+  EXPECT_TRUE(auth_session->OnUserCreated().ok());
+  EXPECT_CALL(*mock_le_manager_ptr, InsertRateLimiter)
+      .WillOnce(DoAll(SetArgPointee<5>(0),
+                      Return(OkStatus<error::CryptohomeLECredError>())));
+
   EXPECT_CALL(*bio_processor_, StartEnrollSession(_))
       .WillOnce([](auto&& callback) { std::move(callback).Run(true); });
 
   // Test.
   TestFuture<CryptohomeStatus> prepare_future;
-  user_data_auth::PrepareAuthFactorRequest request;
-  request.set_auth_session_id(auth_session->serialized_token());
-  request.set_auth_factor_type(user_data_auth::AUTH_FACTOR_TYPE_FINGERPRINT);
-  request.set_purpose(user_data_auth::PURPOSE_ADD_AUTH_FACTOR);
-  auth_session->PrepareAuthFactor(request, prepare_future.GetCallback());
-  auth_session.reset();
-
+  user_data_auth::PrepareAuthFactorRequest prepare_request;
+  prepare_request.set_auth_session_id(auth_session->serialized_token());
+  prepare_request.set_auth_factor_type(
+      user_data_auth::AUTH_FACTOR_TYPE_FINGERPRINT);
+  prepare_request.set_purpose(user_data_auth::PURPOSE_ADD_AUTH_FACTOR);
+  auth_session->PrepareAuthFactor(prepare_request,
+                                  prepare_future.GetCallback());
   // Verify.
   ASSERT_THAT(prepare_future.Get(), IsOk());
+
+  // Test.
+  TestFuture<CryptohomeStatus> terminate_future;
+  user_data_auth::TerminateAuthFactorRequest terminate_request;
+  terminate_request.set_auth_session_id(auth_session->serialized_token());
+  terminate_request.set_auth_factor_type(
+      user_data_auth::AUTH_FACTOR_TYPE_FINGERPRINT);
+  auth_session->TerminateAuthFactor(terminate_request,
+                                    terminate_future.GetCallback());
+  // Verify.
+  ASSERT_THAT(terminate_future.Get(), IsOk());
+
+  // This time, the rate-limiter doesn't need to be created anymore.
+  EXPECT_CALL(*bio_processor_, StartEnrollSession(_))
+      .WillOnce([](auto&& callback) { std::move(callback).Run(true); });
+
+  // Test.
+  TestFuture<CryptohomeStatus> prepare_future2;
+  user_data_auth::PrepareAuthFactorRequest prepare_request2;
+  prepare_request2.set_auth_session_id(auth_session->serialized_token());
+  prepare_request2.set_auth_factor_type(
+      user_data_auth::AUTH_FACTOR_TYPE_FINGERPRINT);
+  prepare_request2.set_purpose(user_data_auth::PURPOSE_ADD_AUTH_FACTOR);
+  auth_session->PrepareAuthFactor(prepare_request2,
+                                  prepare_future2.GetCallback());
+  // Verify.
+  ASSERT_THAT(prepare_future2.Get(), IsOk());
 }
 
 // Test adding two fingerprint auth factors and authenticating them.
@@ -5112,9 +5074,25 @@ TEST_F(AuthSessionWithUssExperimentTest, AddFingerprintAndAuth) {
   // Creating the user.
   EXPECT_TRUE(auth_session.OnUserCreated().ok());
   EXPECT_TRUE(auth_session.has_user_secret_stash());
+
+  // Prepare is necessary to create the rate-limiter.
+  EXPECT_CALL(*mock_le_manager_ptr, InsertRateLimiter)
+      .WillOnce(DoAll(SetArgPointee<5>(kFakeRateLimiterLabel),
+                      Return(OkStatus<error::CryptohomeLECredError>())));
+  EXPECT_CALL(*bio_processor_, StartEnrollSession(_))
+      .WillOnce([](auto&& callback) { std::move(callback).Run(true); });
+  TestFuture<CryptohomeStatus> prepare_future;
+  user_data_auth::PrepareAuthFactorRequest prepare_request;
+  prepare_request.set_auth_session_id(auth_session.serialized_token());
+  prepare_request.set_auth_factor_type(
+      user_data_auth::AUTH_FACTOR_TYPE_FINGERPRINT);
+  prepare_request.set_purpose(user_data_auth::PURPOSE_ADD_AUTH_FACTOR);
+  auth_session.PrepareAuthFactor(prepare_request, prepare_future.GetCallback());
+  ASSERT_THAT(prepare_future.Get(), IsOk());
+
   EXPECT_EQ(AddFirstFingerprintAuthFactor(auth_session),
             user_data_auth::CRYPTOHOME_ERROR_NOT_SET);
-  EXPECT_EQ(AddSubsequentFingerprintAuthFactor(auth_session),
+  EXPECT_EQ(AddSecondFingerprintAuthFactor(auth_session),
             user_data_auth::CRYPTOHOME_ERROR_NOT_SET);
 
   EXPECT_CALL(auth_block_utility_, GetAuthBlockTypeFromState(_))
@@ -5170,14 +5148,10 @@ TEST_F(AuthSessionWithUssExperimentTest, AddFingerprintAndAuth) {
       .WillOnce(Return(1));
   EXPECT_CALL(*mock_le_manager_ptr, GetWrongAuthAttempts(kFakeSecondFpLabel))
       .WillOnce(Return(0));
-  EXPECT_CALL(*mock_le_manager_ptr,
-              ResetCredential(kFakeRateLimiterLabel,
-                              brillo::SecureBlob(kFakeResetSecret),
-                              /*strong_reset=*/true));
-  EXPECT_CALL(
-      *mock_le_manager_ptr,
-      ResetCredential(kFakeFpLabel, brillo::SecureBlob(kFakeResetSecret),
-                      /*strong_reset=*/false));
+  EXPECT_CALL(*mock_le_manager_ptr, ResetCredential(kFakeRateLimiterLabel, _,
+                                                    /*strong_reset=*/true));
+  EXPECT_CALL(*mock_le_manager_ptr, ResetCredential(kFakeFpLabel, _,
+                                                    /*strong_reset=*/false));
   EXPECT_CALL(*mock_le_manager_ptr, ResetCredential(kFakeSecondFpLabel, _, _))
       .Times(0);
 
