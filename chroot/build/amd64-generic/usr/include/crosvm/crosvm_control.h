@@ -443,6 +443,45 @@ bool crosvm_client_usb_attach(const char *socket_path,
 bool crosvm_client_usb_detach(const char *socket_path, uint8_t port);
 
 /**
+ * Attaches a net tap device to the crosvm instance with control socket at `socket_path`.
+ *
+ * # Arguments
+ *
+ * * `socket_path` - Path to the crosvm control socket
+ * * `tap_name` - Name of the tap device
+ * * `out_bus_num` - guest bus number will be written here
+ *
+ * The function returns true on success, false on failure.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - socket_path and tap_name are assumed to point to a
+ * null-terminated CStr. Function checks that the pointers are not null, but caller need to check
+ * the validity of the pointer. out_bus_num is assumed to point to a u8 integer.
+ */
+bool crosvm_client_net_tap_attach(const char *socket_path,
+                                  const char *tap_name,
+                                  uint8_t *out_bus_num);
+
+/**
+ * Detaches a hotplugged tap device from the crosvm instance with control socket at `socket_path`.
+ *
+ * # Arguments
+ *
+ * * `socket_path` - Path to the crosvm control socket
+ * * `bus_num` - Bus number of the tap device to be removed.
+ *
+ * The function returns true on success, and false on failure.
+ *
+ * # Safety
+ *
+ * Function is unsafe due to raw pointer usage - socket_path is assumed to point to a
+ * null-terminated Cstr. Function checks that the pointers are not null, but caller need to check
+ * the validity of the pointer.
+ */
+bool crosvm_client_net_tap_detach(const char *socket_path, uint8_t bus_num);
+
+/**
  * Modifies the battery status of crosvm instance whose control socket is listening on
  * `socket_path`.
  *
