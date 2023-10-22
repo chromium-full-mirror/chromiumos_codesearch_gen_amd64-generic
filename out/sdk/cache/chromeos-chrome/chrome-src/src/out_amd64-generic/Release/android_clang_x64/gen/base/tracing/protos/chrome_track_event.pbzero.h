@@ -2481,6 +2481,70 @@ const char* BlinkTaskScope_TaskScopeType_Name(::perfetto::protos::pbzero::BlinkT
   return "PBZERO_UNKNOWN_ENUM_VALUE";
 }
 
+class PageLoad_Decoder : public ::protozero::TypedProtoDecoder</*MAX_FIELD_ID=*/2, /*HAS_NONPACKED_REPEATED_FIELDS=*/false> {
+ public:
+  PageLoad_Decoder(const uint8_t* data, size_t len) : TypedProtoDecoder(data, len) {}
+  explicit PageLoad_Decoder(const std::string& raw) : TypedProtoDecoder(reinterpret_cast<const uint8_t*>(raw.data()), raw.size()) {}
+  explicit PageLoad_Decoder(const ::protozero::ConstBytes& raw) : TypedProtoDecoder(raw.data, raw.size) {}
+  bool has_navigation_id() const { return at<1>().valid(); }
+  int64_t navigation_id() const { return at<1>().as_int64(); }
+  bool has_url() const { return at<2>().valid(); }
+  ::protozero::ConstChars url() const { return at<2>().as_string(); }
+};
+
+class PageLoad : public ::protozero::Message {
+ public:
+  using Decoder = PageLoad_Decoder;
+  enum : int32_t {
+    kNavigationIdFieldNumber = 1,
+    kUrlFieldNumber = 2,
+  };
+  static constexpr const char* GetName() { return ".perfetto.protos.PageLoad"; }
+
+
+  using FieldMetadata_NavigationId =
+    ::protozero::proto_utils::FieldMetadata<
+      1,
+      ::protozero::proto_utils::RepetitionType::kNotRepeated,
+      ::protozero::proto_utils::ProtoSchemaType::kInt64,
+      int64_t,
+      PageLoad>;
+
+  static constexpr FieldMetadata_NavigationId kNavigationId{};
+  void set_navigation_id(int64_t value) {
+    static constexpr uint32_t field_id = FieldMetadata_NavigationId::kFieldId;
+    // Call the appropriate protozero::Message::Append(field_id, ...)
+    // method based on the type of the field.
+    ::protozero::internal::FieldWriter<
+      ::protozero::proto_utils::ProtoSchemaType::kInt64>
+        ::Append(*this, field_id, value);
+  }
+
+  using FieldMetadata_Url =
+    ::protozero::proto_utils::FieldMetadata<
+      2,
+      ::protozero::proto_utils::RepetitionType::kNotRepeated,
+      ::protozero::proto_utils::ProtoSchemaType::kString,
+      std::string,
+      PageLoad>;
+
+  static constexpr FieldMetadata_Url kUrl{};
+  void set_url(const char* data, size_t size) {
+    AppendBytes(FieldMetadata_Url::kFieldId, data, size);
+  }
+  void set_url(::protozero::ConstChars chars) {
+    AppendBytes(FieldMetadata_Url::kFieldId, chars.data, chars.size);
+  }
+  void set_url(std::string value) {
+    static constexpr uint32_t field_id = FieldMetadata_Url::kFieldId;
+    // Call the appropriate protozero::Message::Append(field_id, ...)
+    // method based on the type of the field.
+    ::protozero::internal::FieldWriter<
+      ::protozero::proto_utils::ProtoSchemaType::kString>
+        ::Append(*this, field_id, value);
+  }
+};
+
 class ScrollPredictorMetrics_Decoder : public ::protozero::TypedProtoDecoder</*MAX_FIELD_ID=*/6, /*HAS_NONPACKED_REPEATED_FIELDS=*/false> {
  public:
   ScrollPredictorMetrics_Decoder(const uint8_t* data, size_t len) : TypedProtoDecoder(data, len) {}
@@ -11142,6 +11206,20 @@ class ChromeTrackEvent : public ::perfetto::protos::pbzero::TrackEvent {
   static constexpr FieldMetadata_ScrollPredictorMetrics kScrollPredictorMetrics{};
   template <typename T = ScrollPredictorMetrics> T* set_scroll_predictor_metrics() {
     return BeginNestedMessage<T>(1055);
+  }
+
+
+  using FieldMetadata_PageLoad =
+    ::protozero::proto_utils::FieldMetadata<
+      1056,
+      ::protozero::proto_utils::RepetitionType::kNotRepeated,
+      ::protozero::proto_utils::ProtoSchemaType::kMessage,
+      PageLoad,
+      ChromeTrackEvent>;
+
+  static constexpr FieldMetadata_PageLoad kPageLoad{};
+  template <typename T = PageLoad> T* set_page_load() {
+    return BeginNestedMessage<T>(1056);
   }
 
 };
