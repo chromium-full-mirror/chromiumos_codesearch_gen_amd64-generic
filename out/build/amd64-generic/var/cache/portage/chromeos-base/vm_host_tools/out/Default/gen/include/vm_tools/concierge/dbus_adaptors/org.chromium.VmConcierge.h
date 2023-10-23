@@ -97,7 +97,7 @@ class VmConciergeInterface {
   virtual void GetVmMemoryManagementKillsConnection(
       const vm_tools::concierge::GetVmMemoryManagementKillsConnectionRequest& in_request,
       vm_tools::concierge::GetVmMemoryManagementKillsConnectionResponse* out_response,
-      base::ScopedFD* out_out_fd) = 0;
+      std::vector<base::ScopedFD>* out_out_fd) = 0;
   // Imports a disk image.
   virtual vm_tools::concierge::ImportDiskImageResponse ImportDiskImage(
       const vm_tools::concierge::ImportDiskImageRequest& in_request,
@@ -486,7 +486,7 @@ class VmConciergeAdaptor {
         "    <method name=\"GetVmMemoryManagementKillsConnection\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
         "      <arg name=\"response\" type=\"ay\" direction=\"out\"/>\n"
-        "      <arg name=\"out_fd\" type=\"h\" direction=\"out\"/>\n"
+        "      <arg name=\"out_fd\" type=\"ah\" direction=\"out\"/>\n"
         "    </method>\n"
         "    <method name=\"ImportDiskImage\">\n"
         "      <arg name=\"request\" type=\"ay\" direction=\"in\"/>\n"
