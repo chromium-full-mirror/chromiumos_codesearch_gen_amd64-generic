@@ -21,7 +21,6 @@
 // --test_utils_header_include_path
 // libhwsec/structures/signature_sealed_data_test_utils.h
 // /build/amd64-generic/var/cache/portage/chromeos-base/cryptohome/out/Default/gen/bfbs/structures.bfbs
-// --filter_by_namespace cryptohome::structure
 
 #include <stdint.h>
 #include <optional>

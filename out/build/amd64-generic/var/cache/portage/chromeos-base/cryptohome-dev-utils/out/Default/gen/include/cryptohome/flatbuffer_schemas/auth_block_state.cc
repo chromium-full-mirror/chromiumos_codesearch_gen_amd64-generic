@@ -25,7 +25,6 @@
 // --test_utils_header_include_path
 // cryptohome/flatbuffer_schemas/structures_test_utils.h
 // /build/amd64-generic/var/cache/portage/chromeos-base/cryptohome-dev-utils/out/Default/gen/bfbs/auth_block_state.bfbs
-// --filter_by_namespace cryptohome
 
 #include <stdint.h>
 #include <optional>
